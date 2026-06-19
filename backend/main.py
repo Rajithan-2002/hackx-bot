@@ -26,6 +26,7 @@ class ChatRequest(BaseModel):
     session_id: str | None = None
 
 @app.post("/api/chat")
+@app.post("/chat")
 async def chat(request: ChatRequest, fastapi_req: Request):
     # Enforce rate limit (30 requests / minute / IP)
     client_host = fastapi_req.client.host if fastapi_req.client else "127.0.0.1"
@@ -42,6 +43,7 @@ async def chat(request: ChatRequest, fastapi_req: Request):
     }
 
 @app.get("/api/health")
+@app.get("/health")
 async def health():
     supabase_ok = False
     vector_ok = False
