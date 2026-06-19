@@ -21,20 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fastapi.responses import FileResponse
-
-@app.get("/")
-async def root():
-    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', 'index.html')
-    if not os.path.exists(file_path):
-        return {"error": f"UI file not found at {file_path}"}
-    return FileResponse(file_path)
-
 class ChatRequest(BaseModel):
     message: str
     session_id: str | None = None
 
-@app.post("/chat")
+@app.post("/api/chat")
 async def chat(request: ChatRequest, fastapi_req: Request):
     # Enforce rate limit (30 requests / minute / IP)
     client_host = fastapi_req.client.host if fastapi_req.client else "127.0.0.1"
@@ -50,7 +41,7 @@ async def chat(request: ChatRequest, fastapi_req: Request):
         "tier": result["tier"]
     }
 
-@app.get("/health")
+@app.get("/api/health")
 async def health():
     supabase_ok = False
     vector_ok = False

@@ -289,7 +289,7 @@
         setMascotState(STATES.THINKING);
 
         try {
-            const response = await fetch(baseOrigin + "/chat", {
+            const response = await fetch(baseOrigin + "/api/chat", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, session_id: sessionId })
