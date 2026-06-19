@@ -24,6 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "HackX Chatbot API is running! Visit /health for status."}
+
 app.mount("/assets", StaticFiles(directory=os.path.join(os.path.dirname(__file__), '..', 'widget', 'assets')), name="assets")
 
 class ChatRequest(BaseModel):
