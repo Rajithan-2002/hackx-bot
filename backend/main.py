@@ -1,7 +1,6 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from backend.config import (
     supabase,
@@ -12,8 +11,6 @@ from backend.config import (
 from backend.rag import answer_question
 from backend.rate_limit import check_rate_limit
 from backend.llm import client as openai_client
-
-from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="HackX Chatbot API")
 
@@ -27,8 +24,6 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {"message": "HackX Chatbot API is running! Visit /health for status."}
-
-app.mount("/assets", StaticFiles(directory=os.path.join(os.path.dirname(__file__), '..', 'widget', 'assets')), name="assets")
 
 class ChatRequest(BaseModel):
     message: str
@@ -95,26 +90,3 @@ async def health():
         "cache": cache_ok,
         "mode": mode
     }
-
-@app.get("/widget.js")
-async def widget_js():
-    widget_path = os.path.join(os.path.dirname(__file__), '..', 'widget', 'widget.js')
-    if os.path.exists(widget_path):
-        headers = {"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
-        return FileResponse(widget_path, media_type="application/javascript", headers=headers)
-    raise HTTPException(status_code=404, detail="widget.js not found")
-
-@app.get("/widget.css")
-async def widget_css():
-    widget_path = os.path.join(os.path.dirname(__file__), '..', 'widget', 'widget.css')
-    if os.path.exists(widget_path):
-        headers = {"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
-        return FileResponse(widget_path, media_type="text/css", headers=headers)
-    raise HTTPException(status_code=404, detail="widget.css not found")
-
-@app.get("/avatar.png")
-async def avatar():
-    avatar_path = os.path.join(os.path.dirname(__file__), '..', 'widget', 'avatar.png')
-    if os.path.exists(avatar_path):
-        return FileResponse(avatar_path, media_type="image/png")
-    raise HTTPException(status_code=404, detail="avatar.png not found")
