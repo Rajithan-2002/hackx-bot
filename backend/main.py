@@ -25,7 +25,10 @@ from fastapi.responses import FileResponse
 
 @app.get("/")
 async def root():
-    return FileResponse("public/index.html")
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', 'index.html')
+    if not os.path.exists(file_path):
+        return {"error": f"UI file not found at {file_path}"}
+    return FileResponse(file_path)
 
 class ChatRequest(BaseModel):
     message: str
