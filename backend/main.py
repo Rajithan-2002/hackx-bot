@@ -21,9 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.responses import FileResponse
+
 @app.get("/")
 async def root():
-    return {"message": "HackX Chatbot API is running! Visit /health for status."}
+    return FileResponse("public/index.html")
 
 class ChatRequest(BaseModel):
     message: str
