@@ -1,0 +1,26 @@
+{
+    "deadline": "registration_deadline",
+    "closing date": "registration_deadline",
+    "last date": "registration_deadline",
+    "registration close": "registration_deadline",
+    "when does registration close": "registration_deadline",
+    "when is the deadline": "registration_deadline",
+
+    "team size": "team_rules",
+    "how many members": "team_rules",
+    "solo": "team_rules",
+    "single person": "team_rules",
+    "different universities": "cross_university",
+    
+    "who can join": "eligibility",
+    "first year": "eligibility",
+    "am i eligible": "eligibility",
+
+    "prizes": "prize_details",
+    "how much is the prize": "prize_details",
+    "winning amount": "prize_details",
+
+    "hackx jr": "hackx_jr",
+    "school students": "hackx_jr",
+    "school": "hackx_jr"
+}

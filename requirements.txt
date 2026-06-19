@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+supabase
+python-dotenv
+pydantic
+openai
+passlib
+pypdf
+pytest
+pytest-asyncio
+httpx
