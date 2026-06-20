@@ -129,3 +129,9 @@ async def health():
         "cache": cache_ok,
         "mode": mode
     }
+
+# Mount static files so local testing can serve widget.js, widget.css, etc.
+# Placed at the end so it doesn't override explicit routes like /
+from fastapi.staticfiles import StaticFiles
+if os.path.exists("public"):
+    app.mount("/", StaticFiles(directory="public"), name="public")
