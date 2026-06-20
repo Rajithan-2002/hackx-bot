@@ -2,14 +2,14 @@
 
 ## Timeline and Important Dates
 
-**ideaX for Other Universities**
+**ideaX for Universities**
 - **Registration Open**: 23 June (Tuesday)
 - **Registration Close**: 28 July (Tuesday)
 - **Proposal Submission Open**: 31 July (Friday)
 - **Proposal Submission Close**: 14 August (Friday)
 - **Semi-Finalists Announcement**: 09 September (Wednesday)
 - **ideaX 30 Teams** (Best 5 teams of ideasprint + 25 other university teams): 03 October (Saturday)
-- **Venue**: DIM LAB
+- **Venue**: DIM | A8
 - **Finalists Announcement**: 08 October (Thursday)
 
 **hackX 11.0 (Best 15 Teams from ideaX)**
