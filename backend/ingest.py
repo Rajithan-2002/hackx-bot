@@ -169,6 +169,7 @@ async def main():
         sample_file = os.path.join(data_dir, 'sample_faq.md')
         hackx_file = os.path.join(data_dir, 'hackx_faq.md')
         hackx_jr_file = os.path.join(data_dir, 'hackx_jr_faq.md')
+        timeline_file = os.path.join(data_dir, 'timeline.md')
         
         if os.path.exists(sample_file):
             await ingest_file(sample_file)
@@ -176,6 +177,8 @@ async def main():
             await ingest_file(hackx_file)
         if os.path.exists(hackx_jr_file):
             await ingest_file(hackx_jr_file)
+        if os.path.exists(timeline_file):
+            await ingest_file(timeline_file)
             
         await seed_exact_faqs()
     else:
