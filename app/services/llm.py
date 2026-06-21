@@ -1,5 +1,5 @@
 import openai
-from backend.config import OPENAI_API_KEY, LLM_MODEL
+from app.core.config import OPENAI_API_KEY, LLM_MODEL
 
 # Initialize OpenAI async client
 client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None

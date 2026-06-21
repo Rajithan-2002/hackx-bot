@@ -2,8 +2,8 @@ import asyncio
 import os
 import sys
 from pypdf import PdfReader
-from backend.config import supabase
-from backend.embeddings import get_embedding
+from app.core.config import supabase
+from app.services.embeddings import get_embedding
 
 def chunk_text(text: str, chunk_size_words: int = 450, overlap_words: int = 75) -> list[str]:
     """Helper to chunk text with overlap based on words."""
@@ -165,7 +165,7 @@ async def main():
 
     if len(sys.argv) < 2:
         # Default ingestion of sample_faq.md, hackx_faq.md and hackx_jr_faq.md
-        data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        data_dir = os.path.join(os.path.dirname(__file__), '..', 'core', 'data')
         sample_file = os.path.join(data_dir, 'sample_faq.md')
         hackx_file = os.path.join(data_dir, 'hackx_faq.md')
         hackx_jr_file = os.path.join(data_dir, 'hackx_jr_faq.md')

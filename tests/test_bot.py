@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, AsyncMock, patch
-from backend.domain_guard import is_domain_valid
-from backend.rag import resolve_aliases, answer_question
+from app.services.domain_guard import is_domain_valid
+from app.services.rag import resolve_aliases, answer_question
 
 def test_domain_guard():
     assert is_domain_valid("When is the registration deadline?") is True
@@ -12,8 +12,8 @@ def test_resolve_aliases():
     assert resolve_aliases("when is the closing date?") == "when is the registration deadline?"
 
 @pytest.mark.asyncio
-@patch("backend.rag.supabase")
-@patch("backend.rag.get_embedding")
+@patch("app.services.rag.supabase")
+@patch("app.services.rag.get_embedding")
 async def test_domain_guard_rejection(mock_embed, mock_supabase):
     mock_embed.return_value = [0.1] * 1536
     res = await answer_question("What is the capital of France?")
@@ -22,8 +22,8 @@ async def test_domain_guard_rejection(mock_embed, mock_supabase):
     assert "Sorry, I can only help" in res["answer"]
 
 @pytest.mark.asyncio
-@patch("backend.rag.supabase")
-@patch("backend.rag.get_cached_response")
+@patch("app.services.rag.supabase")
+@patch("app.services.rag.get_cached_response")
 async def test_cache_hit(mock_get_cache, mock_supabase):
     mock_get_cache.return_value = "This is a cached answer."
     res = await answer_question("When does registration open?")
@@ -32,8 +32,8 @@ async def test_cache_hit(mock_get_cache, mock_supabase):
     assert res["answer"] == "This is a cached answer."
 
 @pytest.mark.asyncio
-@patch("backend.rag.supabase")
-@patch("backend.rag.get_cached_response")
+@patch("app.services.rag.supabase")
+@patch("app.services.rag.get_cached_response")
 async def test_exact_faq_match(mock_get_cache, mock_supabase):
     mock_get_cache.return_value = None
     mock_faq_table = MagicMock()
@@ -53,9 +53,9 @@ async def test_exact_faq_match(mock_get_cache, mock_supabase):
     assert res["answer"] == "Teams must consist of 2 to 4 members."
 
 @pytest.mark.asyncio
-@patch("backend.rag.supabase")
-@patch("backend.rag.get_cached_response")
-@patch("backend.rag.get_embedding")
+@patch("app.services.rag.supabase")
+@patch("app.services.rag.get_cached_response")
+@patch("app.services.rag.get_embedding")
 async def test_vector_match_high_confidence(mock_embed, mock_get_cache, mock_supabase):
     mock_get_cache.return_value = None
     mock_faq_table = MagicMock()
@@ -79,10 +79,10 @@ async def test_vector_match_high_confidence(mock_embed, mock_get_cache, mock_sup
     assert "MAS Arena" in res["answer"]
 
 @pytest.mark.asyncio
-@patch("backend.rag.supabase")
-@patch("backend.rag.get_cached_response")
-@patch("backend.rag.get_embedding")
-@patch("backend.rag.generate_response")
+@patch("app.services.rag.supabase")
+@patch("app.services.rag.get_cached_response")
+@patch("app.services.rag.get_embedding")
+@patch("app.services.rag.generate_response")
 async def test_llm_fallback(mock_llm, mock_embed, mock_get_cache, mock_supabase):
     mock_get_cache.return_value = None
     mock_faq_table = MagicMock()
@@ -108,10 +108,10 @@ async def test_llm_fallback(mock_llm, mock_embed, mock_get_cache, mock_supabase)
     assert res["answer"] == "Yes, first-year university students are eligible to join."
 
 @pytest.mark.asyncio
-@patch("backend.rag.supabase")
-@patch("backend.rag.get_cached_response")
-@patch("backend.rag.get_embedding")
-@patch("backend.rag.generate_response")
+@patch("app.services.rag.supabase")
+@patch("app.services.rag.get_cached_response")
+@patch("app.services.rag.get_embedding")
+@patch("app.services.rag.generate_response")
 async def test_llm_fallback_failure_retrieval_only(mock_llm, mock_embed, mock_get_cache, mock_supabase):
     mock_get_cache.return_value = None
     mock_faq_table = MagicMock()

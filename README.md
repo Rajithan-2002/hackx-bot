@@ -21,20 +21,27 @@ cp .env.example .env
 ```
 
 ### 4. Database Schema Setup
-Run the SQL scripts in your Supabase dashboard's SQL Editor:
-1. First, run the contents of [sql/schema.sql](file:///d:/Projects/hackx-chatbot/sql/schema.sql) to create the tables.
-2. Next, run [sql/pgvector.sql](file:///d:/Projects/hackx-chatbot/sql/pgvector.sql) to enable the vector extension and create the matching function.
+You can set up the tables, extensions, and functions automatically or manually:
+
+*   **Option A: Automatic Setup**
+    Ensure `SUPABASE_DB_URL` is configured in your `.env` file, then run:
+    ```bash
+    python -m app.scripts.setup_db
+    ```
+
+*   **Option B: Manual Setup**
+    Copy the SQL contents from [app/core/database/init_db.sql](file:///d:/HackX/hackx-bot/app/core/database/init_db.sql) and run them in your Supabase project's **SQL Editor**.
 
 ### 5. Ingestion of Knowledge base
 Run the ingestion script to process the sample FAQ and seed exact FAQs:
 ```bash
-python -m backend.ingest
+python -m app.scripts.ingest
 ```
 
 ### 6. Local Development Running
 Start the FastAPI server:
 ```bash
-uvicorn backend.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 Open [http://localhost:8000/health](http://localhost:8000/health) to verify connectivity.

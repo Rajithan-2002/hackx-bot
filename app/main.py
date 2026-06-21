@@ -2,15 +2,15 @@ import os
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.config import (
+from app.core.config import (
     supabase,
     OPENAI_API_KEY,
     ENABLE_LLM_FALLBACK,
     ENABLE_RETRIEVAL_ONLY_MODE
 )
-from backend.rag import answer_question
-from backend.rate_limit import check_rate_limit
-from backend.llm import client as openai_client
+from app.services.rag import answer_question
+from app.middleware.rate_limit import check_rate_limit
+from app.services.llm import client as openai_client
 
 app = FastAPI(title="HackX Chatbot API")
 

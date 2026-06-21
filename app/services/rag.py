@@ -2,7 +2,7 @@ import json
 import os
 import re
 import traceback
-from backend.config import (
+from app.core.config import (
     supabase,
     EXACT_MATCH_THRESHOLD,
     VECTOR_THRESHOLD,
@@ -10,18 +10,18 @@ from backend.config import (
     ENABLE_LLM_FALLBACK,
     ENABLE_RETRIEVAL_ONLY_MODE
 )
-from backend.embeddings import get_embedding
-from backend.llm import generate_response
-from backend.domain_guard import is_domain_valid
-from backend.cache import get_cached_response, set_cached_response
-from backend.analytics import log_chat
+from app.services.embeddings import get_embedding
+from app.services.llm import generate_response
+from app.services.domain_guard import is_domain_valid
+from app.services.cache import get_cached_response, set_cached_response
+from app.utils.analytics import log_chat
 
 # In-memory session context: session_id -> list of {"role": "user"|"assistant", "content": str}
 SESSIONS = {}
 MAX_SESSION_HISTORY = 6 # Last 3 turn pairs (3 user, 3 assistant)
 
 # Load aliases
-ALIASES_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'aliases.json')
+ALIASES_FILE = os.path.join(os.path.dirname(__file__), '..', 'core', 'data', 'aliases.json')
 try:
     with open(ALIASES_FILE, 'r') as f:
         aliases_map = json.load(f)

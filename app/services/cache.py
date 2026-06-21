@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime
-from backend.config import supabase
+from app.core.config import supabase
 
 def get_hash(text: str) -> str:
     return hashlib.md5(text.encode('utf-8')).hexdigest()

@@ -1,4 +1,4 @@
-from backend.config import supabase
+from app.core.config import supabase
 
 def log_chat(question: str, answer: str, route: str, confidence: float = 0.0):
     if not supabase:

@@ -7,3 +7,4 @@ openai
 passlib
 pypdf
 httpx
+psycopg2-binary
