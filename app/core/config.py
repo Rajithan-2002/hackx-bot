@@ -18,18 +18,55 @@ LLM_THRESHOLD = 0.25
 
 # Configuration Flags for testing/resilience
 ENABLE_LLM_FALLBACK = os.getenv("ENABLE_LLM_FALLBACK", "True").lower() == "true"
-ENABLE_RETRIEVAL_ONLY_MODE = os.getenv("ENABLE_RETRIEVAL_ONLY_MODE", "True").lower() == "true"
+ENABLE_RETRIEVAL_ONLY_MODE = (
+    os.getenv("ENABLE_RETRIEVAL_ONLY_MODE", "True").lower() == "true"
+)
 
 # Domain Guard Configuration
 DOMAIN_KEYWORDS = [
-    "hackx", "hackx jr", "registration", "eligibility", "timeline",
-    "venue", "judging", "sponsors", "rules", "submission", "team",
-    "contact", "prize", "deadline", "member", "student", "submit",
-    "idea", "proposal", "pitch", "video", "prototype", "workshop",
-    "seminar", "challenge", "award", "cash", "certificate", "startup",
-    "youtube", "link", "unlisted", "business", "innovation", "entrepreneur",
-    "participate", "register", "join", "competition", "objective"
+    "hackx",
+    "hackx jr",
+    "registration",
+    "eligibility",
+    "timeline",
+    "venue",
+    "judging",
+    "sponsors",
+    "rules",
+    "submission",
+    "team",
+    "contact",
+    "prize",
+    "deadline",
+    "member",
+    "student",
+    "submit",
+    "idea",
+    "proposal",
+    "pitch",
+    "video",
+    "prototype",
+    "workshop",
+    "seminar",
+    "challenge",
+    "award",
+    "cash",
+    "certificate",
+    "startup",
+    "youtube",
+    "link",
+    "unlisted",
+    "business",
+    "innovation",
+    "entrepreneur",
+    "participate",
+    "register",
+    "join",
+    "competition",
+    "objective",
 ]
 
 # Initialize supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
+supabase: Client = (
+    create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
+)

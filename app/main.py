@@ -1,12 +1,14 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from app.core.config import (
     supabase,
     OPENAI_API_KEY,
     ENABLE_LLM_FALLBACK,
-    ENABLE_RETRIEVAL_ONLY_MODE
+    ENABLE_RETRIEVAL_ONLY_MODE,
 )
 from app.services.rag import answer_question
 from app.middleware.rate_limit import check_rate_limit
@@ -16,55 +18,29 @@ app = FastAPI(title="HackX Chatbot API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict to hackx.lk in production
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-from fastapi.responses import HTMLResponse
-
-HTML_CONTENT = """<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HackX 11.0 | Mockup</title>
-    <style>
-        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #080808; color: white; min-height: 100vh; }
-        header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-        .logo { font-size: 24px; font-weight: bold; color: #7C3AED; }
-        nav { display: flex; gap: 20px; }
-        nav a { color: #ccc; text-decoration: none; }
-        nav a:hover { color: white; }
-        .hero { text-align: center; padding: 100px 20px; }
-        h1 { font-size: 64px; margin: 0; background: linear-gradient(to right, #7C3AED, #c084fc); -webkit-background-clip: text; color: transparent; }
-        p { font-size: 20px; color: #aaa; max-width: 600px; margin: 20px auto; }
-        .btn { background: #7C3AED; color: white; border: none; padding: 12px 32px; font-size: 18px; border-radius: 8px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="logo">HackX 11.0</div>
-        <nav><a href="#">About</a><a href="#">Timeline</a><a href="#">Sponsors</a><a href="#">Contact</a></nav>
-    </header>
-    <div class="hero">
-        <h1>Sri Lanka's Premier Hackathon</h1>
-        <p>Join the 11th edition of HackX and build the future. Registration opens soon!</p>
-        <button class="btn">Register Now</button>
-    </div>
-    <!-- HackX Chatbot Widget Injection -->
-    <script src="/widget.js"></script>
-</body>
-</html>"""
 
 @app.get("/")
 @app.get("/api")
 async def root():
-    return HTMLResponse(content=HTML_CONTENT)
+    index_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "public", "index.html")
+    )
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return HTMLResponse(content=content)
+    return HTMLResponse(content="<h1>Mockup not found</h1>", status_code=404)
+
 
 class ChatRequest(BaseModel):
     message: str
     session_id: str | None = None
+
 
 @app.post("/api/chat")
 @app.post("/chat")
@@ -80,8 +56,9 @@ async def chat(request: ChatRequest, fastapi_req: Request):
     return {
         "answer": result["answer"],
         "source": result["source"],
-        "tier": result["tier"]
+        "tier": result["tier"],
     }
+
 
 @app.get("/api/health")
 @app.get("/health")
@@ -127,11 +104,13 @@ async def health():
         "openai": openai_ok,
         "vector_search": vector_ok,
         "cache": cache_ok,
-        "mode": mode
+        "mode": mode,
     }
+
 
 # Mount static files so local testing can serve widget.js, widget.css, etc.
 # Placed at the end so it doesn't override explicit routes like /
-from fastapi.staticfiles import StaticFiles
-if os.path.exists("public"):
-    app.mount("/", StaticFiles(directory="public"), name="public")
+
+public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "public"))
+if os.path.exists(public_dir):
+    app.mount("/", StaticFiles(directory=public_dir), name="public")
