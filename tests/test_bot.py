@@ -163,3 +163,34 @@ def test_app_import():
     from app.main import app as fastapi_app
 
     assert isinstance(fastapi_app, FastAPI)
+
+
+def test_rate_limiter_integration():
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    # Reset limiter state before the test to avoid interference from other tests/runs
+    if hasattr(app.state, "limiter"):
+        app.state.limiter.reset()
+
+    client = TestClient(app)
+
+    with patch("app.main.answer_question") as mock_answer:
+        mock_answer.return_value = {
+            "answer": "Test answer",
+            "source": "cache",
+            "tier": 2,
+        }
+
+        # Make 30 requests - they should all succeed (200 OK)
+        for _ in range(30):
+            response = client.post(
+                "/api/chat", json={"message": "hello", "session_id": "test"}
+            )
+            assert response.status_code == 200
+
+        # The 31st request should be rate limited (429 Too Many Requests)
+        response = client.post(
+            "/api/chat", json={"message": "hello", "session_id": "test"}
+        )
+        assert response.status_code == 429

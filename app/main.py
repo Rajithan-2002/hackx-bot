@@ -11,10 +11,14 @@ from app.core.config import (
     ENABLE_RETRIEVAL_ONLY_MODE,
 )
 from app.services.rag import answer_question
-from app.middleware.rate_limit import check_rate_limit
+from app.middleware.rate_limit import limiter
 from app.services.llm import client as openai_client
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 app = FastAPI(title="HackX Chatbot API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,15 +48,12 @@ class ChatRequest(BaseModel):
 
 @app.post("/api/chat")
 @app.post("/chat")
-async def chat(request: ChatRequest, fastapi_req: Request):
-    # Enforce rate limit (30 requests / minute / IP)
-    client_host = fastapi_req.client.host if fastapi_req.client else "127.0.0.1"
-    check_rate_limit(client_host)
-
-    if not request.message:
+@limiter.limit("30/minute")
+async def chat(chat_request: ChatRequest, request: Request):
+    if not chat_request.message:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
-    result = await answer_question(request.message, request.session_id)
+    result = await answer_question(chat_request.message, chat_request.session_id)
     return {
         "answer": result["answer"],
         "source": result["source"],
