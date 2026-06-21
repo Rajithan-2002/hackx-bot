@@ -1,0 +1,17 @@
+.git
+.gitignore
+.env
+.env.example
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+tests/
+scratch*
+.system_generated/
+walkthrough.md
+task.md
+implementation_plan.md
+Dockerfile
+.dockerignore

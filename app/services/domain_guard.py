@@ -1,4 +1,5 @@
-from backend.config import DOMAIN_KEYWORDS
+from app.core.config import DOMAIN_KEYWORDS
+
 
 def is_domain_valid(question: str) -> bool:
     q_lower = question.lower()

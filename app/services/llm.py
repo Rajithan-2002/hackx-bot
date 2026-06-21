@@ -1,8 +1,9 @@
 import openai
-from backend.config import OPENAI_API_KEY, LLM_MODEL
+from app.core.config import OPENAI_API_KEY, LLM_MODEL
 
 # Initialize OpenAI async client
 client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+
 
 async def generate_response(context: str, question: str) -> str:
     if not client:
@@ -34,7 +35,7 @@ async def generate_response(context: str, question: str) -> str:
         "- Reduce hesitation and encourage first-time innovators.\n"
         "- If a user seems unsure, provide reassurance and practical guidance.\n"
         "- Never invent information that is not present in the knowledge base.\n"
-        "- If information is unavailable, say: \"I don't have confirmed information on that yet. Please contact the Organizing Committee or follow the official channels for updates.\"\n\n"
+        '- If information is unavailable, say: "I don\'t have confirmed information on that yet. Please contact the Organizing Committee or follow the official channels for updates."\n\n'
         "For registration-related questions:\n"
         "- Encourage users to register through the official website.\n"
         "- Remind users about upcoming deadlines where relevant.\n\n"
@@ -65,9 +66,9 @@ async def generate_response(context: str, question: str) -> str:
         model=LLM_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt},
         ],
         temperature=0.0,
-        max_tokens=300
+        max_tokens=300,
     )
     return response.choices[0].message.content.strip()

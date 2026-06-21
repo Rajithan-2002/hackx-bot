@@ -27,7 +27,7 @@
                 <div class="header-title">
                     <div class="header-main-title">
                         <div class="header-avatar-container">
-                            <img src="${baseOrigin}/assets/JR-mascot-with-lap.png" alt="Bot" />
+                            <img src="${baseOrigin}/assets/mascot-with-lap.png" alt="Bot" />
                         </div>
                         <span>HackX Assistant</span>
                     </div>
@@ -45,7 +45,7 @@
             </div>
         </div>
         <div id="hackx-mascot-launcher" class="greeting">
-            <img id="hackx-mascot-img" src="${baseOrigin}/assets/Jr%20one%20handed.png" alt="Mascot" />
+            <img id="hackx-mascot-img" src="${baseOrigin}/assets/mascot-one-handed.png" alt="Mascot" />
         </div>
     `;
 
@@ -70,10 +70,10 @@
     };
 
     const mascotImages = {
-        [STATES.GREETING]: baseOrigin + '/assets/Jr%20one%20handed.png',
-        [STATES.IDLE]: baseOrigin + '/assets/Jr%20one%20handed.png',
-        [STATES.THINKING]: baseOrigin + '/assets/JR-mascot-with-lap.png',
-        [STATES.SUCCESS]: baseOrigin + '/assets/Jr%20two%20handed.png'
+        [STATES.GREETING]: baseOrigin + '/assets/mascot-one-handed.png',
+        [STATES.IDLE]: baseOrigin + '/assets/mascot-one-handed.png',
+        [STATES.THINKING]: baseOrigin + '/assets/mascot-with-lap.png',
+        [STATES.SUCCESS]: baseOrigin + '/assets/mascot-two-handed.png'
     };
 
     // Debug Mode Configuration: active if URL has ?debug=true or localStorage has hackx_debug = true
@@ -96,7 +96,7 @@
     });
     // Preload VR mascot
     const vrMascot = new Image();
-    vrMascot.src = baseOrigin + '/assets/hackx%20vr%20mascot.png';
+    vrMascot.src = baseOrigin + '/assets/vr-mascot.png';
 
     let isWelcomeShown = false;
     let currentMascotState = STATES.GREETING;
@@ -183,6 +183,10 @@
                     <span>Rules & Guidelines</span>
                     <span class="hackx-chevron">&rsaquo;</span>
                 </div>
+                <div class="hackx-menu-item" data-query="HackX">
+                    <span>HackX</span>
+                    <span class="hackx-chevron">&rsaquo;</span>
+                </div>
                 <div class="hackx-menu-item" data-query="HackX Jr">
                     <span>HackX Jr</span>
                     <span class="hackx-chevron">&rsaquo;</span>
@@ -249,6 +253,7 @@
                     <div class="hackx-chip" data-query="Eligibility">Eligibility</div>
                     <div class="hackx-chip" data-query="Timeline">Timeline</div>
                     <div class="hackx-chip" data-query="Rules & Guidelines">Rules & Guidelines</div>
+                    <div class="hackx-chip" data-query="HackX">HackX</div>
                     <div class="hackx-chip" data-query="HackX Jr">HackX Jr</div>
                     <div class="hackx-chip" data-query="Contact">Contact</div>
                 </div>

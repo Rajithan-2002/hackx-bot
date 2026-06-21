@@ -25,6 +25,7 @@ create table chat_logs (
   question text not null,
   answer text not null,
   route_used text not null, -- FAQ, VECTOR, LLM, OUT_OF_SCOPE
+  confidence float default 0.0,
   timestamp timestamptz default now()
 );
 
@@ -33,9 +34,11 @@ create table chat_cache (
   id uuid primary key default gen_random_uuid(),
   question_hash text not null unique,
   answer text not null,
+  source text not null default 'cache',
   usage_count int default 1,
   created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  updated_at timestamptz default now(),
+  last_used timestamptz default now()
 );
 
 -- Vector similarity search function

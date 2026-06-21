@@ -78,10 +78,10 @@ flowchart TD
 The assistant features an interactive mascot launcher that changes poses to match the conversation flow.
 
 ### Mascot States:
-- **GREETING** (`Jr one handed.png`): Displayed on page load along with a welcoming speech bubble.
-- **IDLE** (`Jr one handed.png`): Default floating/breathing state when the chat panel is closed.
-- **THINKING** (`JR-mascot-with-lap.png`): Active when the chat panel is open or while waiting for a backend response.
-- **SUCCESS** (`Jr two handed.png`): Triggered for 1.5 seconds when an answer is delivered.
+- **GREETING** (`mascot-one-handed.png`): Displayed on page load along with a welcoming speech bubble.
+- **IDLE** (`mascot-one-handed.png`): Default floating/breathing state when the chat panel is closed.
+- **THINKING** (`mascot-with-lap.png`): Active when the chat panel is open or while waiting for a backend response.
+- **SUCCESS** (`mascot-two-handed.png`): Triggered for 1.5 seconds when an answer is delivered.
 
 ```mermaid
 stateDiagram-v2
