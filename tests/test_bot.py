@@ -97,6 +97,7 @@ async def test_vector_match_high_confidence(mock_embed, mock_get_cache, mock_sup
 @patch("app.services.rag.get_cached_response")
 @patch("app.services.rag.get_embedding")
 @patch("app.services.rag.generate_response")
+@patch("app.services.rag.ENABLE_LLM_FALLBACK", new=True)
 async def test_llm_fallback(mock_llm, mock_embed, mock_get_cache, mock_supabase):
     mock_get_cache.return_value = None
     mock_faq_table = MagicMock()
@@ -129,6 +130,8 @@ async def test_llm_fallback(mock_llm, mock_embed, mock_get_cache, mock_supabase)
 @patch("app.services.rag.get_cached_response")
 @patch("app.services.rag.get_embedding")
 @patch("app.services.rag.generate_response")
+@patch("app.services.rag.ENABLE_LLM_FALLBACK", new=True)
+@patch("app.services.rag.ENABLE_RETRIEVAL_ONLY_MODE", new=True)
 async def test_llm_fallback_failure_retrieval_only(
     mock_llm, mock_embed, mock_get_cache, mock_supabase
 ):
