@@ -8,7 +8,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE OR REPLACE FUNCTION match_documents(
   query_embedding vector(1536),
   match_threshold FLOAT,
-  match_count INT
+  match_count INT,
+  filter_competition_id TEXT
 )
 RETURNS TABLE (
   id UUID,
@@ -25,6 +26,7 @@ AS $$
     1 - (embedding <=> query_embedding) AS similarity
   FROM document_chunks
   WHERE 1 - (embedding <=> query_embedding) > match_threshold
+    AND metadata->>'competition_id' = filter_competition_id
   ORDER BY embedding <=> query_embedding
   LIMIT match_count;
 $$;

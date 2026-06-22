@@ -121,7 +121,7 @@ def extract_pdf(filepath: str) -> list[dict]:
     return chunks
 
 
-async def ingest_file(filepath: str):
+async def ingest_file(filepath: str, competition_id: str = "hackx"):
     if not supabase:
         print("Error: Supabase client is not configured.")
         return
@@ -142,7 +142,7 @@ async def ingest_file(filepath: str):
             supabase.table("document_chunks").insert(
                 {
                     "chunk_text": chunk["chunk_text"],
-                    "metadata": chunk["metadata"],
+                    "metadata": {**chunk["metadata"], "competition_id": competition_id},
                     "embedding": embedding,
                 }
             ).execute()
@@ -151,7 +151,7 @@ async def ingest_file(filepath: str):
             print(f"  [ERROR] Failed to ingest chunk: {e}")
 
 
-async def seed_exact_faqs():
+async def seed_exact_faqs(competition_id: str = "hackx"):
     if not supabase:
         return
     exact_faqs = [
@@ -163,6 +163,7 @@ async def seed_exact_faqs():
                 "when registration opens",
                 "registration open date",
             ],
+            "competition_id": competition_id,
         },
         {
             "question": "What is the team size?",
@@ -174,11 +175,13 @@ async def seed_exact_faqs():
                 "how many people",
                 "team size limit",
             ],
+            "competition_id": competition_id,
         },
         {
             "question": "Where is the venue?",
             "answer": "The HackX 11.0 main hackathon event will take place at the Royal College MAS Arena in Colombo, Sri Lanka.",
             "aliases": ["venue location", "hackathon venue", "where is it held"],
+            "competition_id": competition_id,
         },
     ]
     print(f"Seeding {len(exact_faqs)} exact FAQs...")
@@ -213,15 +216,15 @@ async def main():
         timeline_file = os.path.join(data_dir, "timeline.md")
 
         if os.path.exists(sample_file):
-            await ingest_file(sample_file)
+            await ingest_file(sample_file, competition_id="hackx")
         if os.path.exists(hackx_file):
-            await ingest_file(hackx_file)
+            await ingest_file(hackx_file, competition_id="hackx")
         if os.path.exists(hackx_jr_file):
-            await ingest_file(hackx_jr_file)
+            await ingest_file(hackx_jr_file, competition_id="hackxjr")
         if os.path.exists(timeline_file):
-            await ingest_file(timeline_file)
+            await ingest_file(timeline_file, competition_id="hackx")
 
-        await seed_exact_faqs()
+        await seed_exact_faqs(competition_id="hackx")
     else:
         await ingest_file(sys.argv[1])
 

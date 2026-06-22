@@ -7,10 +7,10 @@ def get_hash(text: str) -> str:
     return hashlib.md5(text.encode("utf-8")).hexdigest()
 
 
-def get_cached_response(question: str) -> str | None:
+def get_cached_response(question: str, competition_id: str) -> str | None:
     if not supabase:
         return None
-    q_hash = get_hash(question.lower().strip())
+    q_hash = get_hash(f"{competition_id}:{question.lower().strip()}")
     try:
         result = (
             supabase.table("chat_cache")
@@ -30,10 +30,10 @@ def get_cached_response(question: str) -> str | None:
     return None
 
 
-def set_cached_response(question: str, answer: str, source: str = "cache"):
+def set_cached_response(question: str, answer: str, competition_id: str, source: str = "cache"):
     if not supabase:
         return
-    q_hash = get_hash(question.lower().strip())
+    q_hash = get_hash(f"{competition_id}:{question.lower().strip()}")
     try:
         supabase.table("chat_cache").insert(
             {"question_hash": q_hash, "answer": answer, "source": source}

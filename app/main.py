@@ -6,13 +6,13 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from app.core.config import (
     supabase,
-    OPENAI_API_KEY,
+    OPENAI_API_KEYS,
     ENABLE_LLM_FALLBACK,
     ENABLE_RETRIEVAL_ONLY_MODE,
 )
 from app.services.rag import answer_question
 from app.middleware.rate_limit import limiter
-from app.services.llm import client as openai_client
+from app.services.llm import clients as openai_clients
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 
@@ -32,7 +32,7 @@ app.add_middleware(
 @app.get("/api")
 async def root():
     index_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "public", "index.html")
+        os.path.join(os.path.dirname(__file__), "..", "public", "index.html")
     )
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
@@ -43,6 +43,7 @@ async def root():
 
 class ChatRequest(BaseModel):
     message: str
+    competition_id: str
     session_id: str | None = None
 
 
@@ -52,8 +53,10 @@ class ChatRequest(BaseModel):
 async def chat(chat_request: ChatRequest, request: Request):
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
+    if not chat_request.competition_id:
+        raise HTTPException(status_code=400, detail="Competition selection required")
 
-    result = await answer_question(chat_request.message, chat_request.session_id)
+    result = await answer_question(chat_request.message, chat_request.competition_id, chat_request.session_id)
     return {
         "answer": result["answer"],
         "source": result["source"],
@@ -67,7 +70,7 @@ async def health():
     supabase_ok = False
     vector_ok = False
     cache_ok = False
-    openai_ok = bool(openai_client and OPENAI_API_KEY)
+    openai_ok = bool(openai_clients and OPENAI_API_KEYS)
 
     # Check Supabase, Vector Search, and Cache
     if supabase:
@@ -112,6 +115,6 @@ async def health():
 # Mount static files so local testing can serve widget.js, widget.css, etc.
 # Placed at the end so it doesn't override explicit routes like /
 
-public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "public"))
+public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public"))
 if os.path.exists(public_dir):
     app.mount("/", StaticFiles(directory=public_dir), name="public")

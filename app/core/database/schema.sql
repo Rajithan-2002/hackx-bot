@@ -4,6 +4,7 @@
 -- 1. Exact FAQ table (for tier 4 matching — no embedding needed)
 CREATE TABLE IF NOT EXISTS faq_exact (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  competition_id VARCHAR(50) NOT NULL,
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   aliases JSONB DEFAULT '[]',

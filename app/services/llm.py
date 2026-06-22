@@ -1,13 +1,19 @@
 import openai
-from app.core.config import OPENAI_API_KEY, LLM_MODEL
+import itertools
+from app.core.config import OPENAI_API_KEYS, LLM_MODEL
 
-# Initialize OpenAI async client
-client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+# Initialize OpenAI async clients
+clients = [openai.AsyncOpenAI(api_key=key) for key in OPENAI_API_KEYS]
+client_cycle = itertools.cycle(clients) if clients else None
+
+def get_client():
+    if not client_cycle:
+        raise ValueError("OpenAI clients not configured. Missing API Keys.")
+    return next(client_cycle)
 
 
 async def generate_response(context: str, question: str) -> str:
-    if not client:
-        raise ValueError("OpenAI client not configured. Missing API Key.")
+    client = get_client()
 
     system_prompt = (
         "You are the official hackX and hackX Jr virtual assistant.\n"

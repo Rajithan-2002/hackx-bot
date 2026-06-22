@@ -1,12 +1,18 @@
 import openai
-from app.core.config import OPENAI_API_KEY, EMBED_MODEL
+import itertools
+from app.core.config import OPENAI_API_KEYS, EMBED_MODEL
 
-# Initialize OpenAI async client
-client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+# Initialize OpenAI async clients
+clients = [openai.AsyncOpenAI(api_key=key) for key in OPENAI_API_KEYS]
+client_cycle = itertools.cycle(clients) if clients else None
+
+def get_client():
+    if not client_cycle:
+        raise ValueError("OpenAI clients not configured. Missing API Keys.")
+    return next(client_cycle)
 
 
 async def get_embedding(text: str) -> list[float]:
-    if not client:
-        raise ValueError("OpenAI client not configured. Missing API Key.")
+    client = get_client()
     response = await client.embeddings.create(input=text, model=EMBED_MODEL)
     return response.data[0].embedding

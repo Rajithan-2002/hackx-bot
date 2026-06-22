@@ -22,7 +22,7 @@
             <div class="hackx-bubble-close">&times;</div>
             <div id="hackx-greeting-text">👋 Hi there!<br/>Need help with HackX?</div>
         </div>
-        <div id="hackx-chat-panel">
+                <div id="hackx-chat-panel">
             <div id="hackx-header">
                 <div class="header-title">
                     <div class="header-main-title">
@@ -38,8 +38,24 @@
                 </div>
                 <div id="hackx-close">&times;</div>
             </div>
-            <div id="hackx-messages"></div>
-            <div id="hackx-input-area">
+            <div id="hackx-context-header">
+                <span class="hackx-context-indicator"></span>
+                <button class="hackx-switch-comp-btn">Switch Competition</button>
+            </div>
+            <div id="hackx-selection-screen">
+                <h3>Choose your competition</h3>
+                <p>Please select a category to continue</p>
+                <div class="hackx-comp-btn" data-comp="hackx">
+                    <span class="hackx-comp-btn-title">HackX</span>
+                    <span class="hackx-comp-btn-desc">University & Open Category</span>
+                </div>
+                <div class="hackx-comp-btn" data-comp="hackxjr">
+                    <span class="hackx-comp-btn-title">HackX Jr</span>
+                    <span class="hackx-comp-btn-desc">School Category</span>
+                </div>
+            </div>
+            <div id="hackx-messages" style="display: none;"></div>
+            <div id="hackx-input-area" style="display: none;">
                 <input type="text" id="hackx-input" placeholder="Type your question..." />
                 <button id="hackx-send">Send</button>
             </div>
@@ -60,6 +76,49 @@
     const input = document.getElementById('hackx-input');
     const sendBtn = document.getElementById('hackx-send');
     const messages = document.getElementById('hackx-messages');
+
+    let selectedCompetition = sessionStorage.getItem('hackx_selected_competition');
+    const selectionScreen = document.getElementById('hackx-selection-screen');
+    const contextHeader = document.getElementById('hackx-context-header');
+    const contextIndicator = contextHeader.querySelector('.hackx-context-indicator');
+    const switchCompBtn = contextHeader.querySelector('.hackx-switch-comp-btn');
+
+    function applyCompetitionContext() {
+        if (!selectedCompetition) {
+            selectionScreen.style.display = 'flex';
+            messages.style.display = 'none';
+            input.parentElement.style.display = 'none';
+            contextHeader.style.display = 'none';
+            isWelcomeShown = false;
+        } else {
+            selectionScreen.style.display = 'none';
+            messages.style.display = 'flex';
+            input.parentElement.style.display = 'flex';
+            contextHeader.style.display = 'flex';
+            contextIndicator.textContent = '🟢 ' + (selectedCompetition === 'hackx' ? 'HackX' : 'HackX Jr');
+            
+            if (!isWelcomeShown) {
+                showWelcomeMessage();
+                isWelcomeShown = true;
+            }
+        }
+    }
+
+    document.querySelectorAll('.hackx-comp-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            selectedCompetition = e.currentTarget.getAttribute('data-comp');
+            sessionStorage.setItem('hackx_selected_competition', selectedCompetition);
+            applyCompetitionContext();
+        });
+    });
+
+    switchCompBtn.addEventListener('click', () => {
+        selectedCompetition = null;
+        sessionStorage.removeItem('hackx_selected_competition');
+        messages.innerHTML = ''; // clear chat history
+        applyCompetitionContext();
+    });
+
 
     // State definitions
     const STATES = {
@@ -147,10 +206,7 @@
         } else {
             panel.style.display = 'flex';
             setMascotState(STATES.THINKING);
-            if (!isWelcomeShown) {
-                showWelcomeMessage();
-                isWelcomeShown = true;
-            }
+            applyCompetitionContext();
         }
     });
 
@@ -159,42 +215,28 @@
         setMascotState(STATES.IDLE);
     });
 
+    
     function showWelcomeMessage() {
         const wrapper = document.createElement('div');
         wrapper.className = 'hackx-msg bot';
+        
+        let actionsHtml = '';
+        const actions = ['Registration', 'Eligibility', 'Timeline', 'Rules & Guidelines', 'Contact'];
+        actions.forEach(action => {
+            actionsHtml += `
+                <div class="hackx-menu-item" data-query="${action}">
+                    <span>${action}</span>
+                    <span class="hackx-chevron">&rsaquo;</span>
+                </div>
+            `;
+        });
+
         wrapper.innerHTML = `
             Hi there! 👋<br/>
-            I'm HackX Assistant. I can help you with all things HackX.<br/><br/>
+            I'm HackX Assistant. I can help you with all things ${selectedCompetition === 'hackx' ? 'HackX' : 'HackX Jr'}.<br/><br/>
             You can ask me about:
             <div class="hackx-menu-list">
-                <div class="hackx-menu-item" data-query="Registration">
-                    <span>Registration</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
-                <div class="hackx-menu-item" data-query="Eligibility">
-                    <span>Eligibility</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
-                <div class="hackx-menu-item" data-query="Timeline">
-                    <span>Timeline</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
-                <div class="hackx-menu-item" data-query="Rules & Guidelines">
-                    <span>Rules & Guidelines</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
-                <div class="hackx-menu-item" data-query="HackX">
-                    <span>HackX</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
-                <div class="hackx-menu-item" data-query="HackX Jr">
-                    <span>HackX Jr</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
-                <div class="hackx-menu-item" data-query="Contact">
-                    <span>Contact Details</span>
-                    <span class="hackx-chevron">&rsaquo;</span>
-                </div>
+                ${actionsHtml}
             </div>
         `;
         messages.appendChild(wrapper);
@@ -246,6 +288,7 @@
         if (sender === 'bot') {
             const browseContainer = document.createElement('div');
             browseContainer.className = 'hackx-browse-more-container';
+            
             browseContainer.innerHTML = `
                 <div class="hackx-browse-more-text" style="margin-top: 10px; font-size: 12px; color: var(--hackx-muted); font-weight: 500;">Do you want further clarifications in other areas?</div>
                 <div class="hackx-quick-replies" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;">
@@ -253,11 +296,10 @@
                     <div class="hackx-chip" data-query="Eligibility">Eligibility</div>
                     <div class="hackx-chip" data-query="Timeline">Timeline</div>
                     <div class="hackx-chip" data-query="Rules & Guidelines">Rules & Guidelines</div>
-                    <div class="hackx-chip" data-query="HackX">HackX</div>
-                    <div class="hackx-chip" data-query="HackX Jr">HackX Jr</div>
                     <div class="hackx-chip" data-query="Contact">Contact</div>
                 </div>
             `;
+
             messages.appendChild(browseContainer);
 
             // Bind click handlers to the bottom chips
@@ -297,7 +339,7 @@
             const response = await fetch(baseOrigin + "/api/chat", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, session_id: sessionId })
+                body: JSON.stringify({ message: text, session_id: sessionId, competition_id: selectedCompetition })
             });
 
             if (!response.ok) {

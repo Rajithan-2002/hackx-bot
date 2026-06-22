@@ -468,3 +468,95 @@
         bottom: 120px;
     }
 }
+
+/* Competition Selection Screen */
+#hackx-selection-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 24px;
+    background: radial-gradient(circle at center, #041a3a 0%, var(--hackx-bg) 100%);
+    text-align: center;
+}
+
+#hackx-selection-screen h3 {
+    color: var(--hackx-text);
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+#hackx-selection-screen p {
+    color: var(--hackx-muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.hackx-comp-btn {
+    width: 100%;
+    background: rgba(26, 111, 212, 0.1);
+    border: 1px solid var(--hackx-primary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.hackx-comp-btn:hover {
+    background: var(--hackx-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 111, 212, 0.3);
+}
+
+.hackx-comp-btn-title {
+    color: var(--hackx-text);
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.hackx-comp-btn-desc {
+    color: var(--hackx-cyan);
+    font-size: 12px;
+}
+
+.hackx-comp-btn:hover .hackx-comp-btn-desc {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Context Header */
+#hackx-context-header {
+    display: none;
+    background: rgba(4, 26, 58, 0.8);
+    padding: 8px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--hackx-border);
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hackx-context-indicator {
+    color: var(--hackx-success);
+    font-weight: 500;
+}
+
+.hackx-switch-comp-btn {
+    background: transparent;
+    border: 1px solid var(--hackx-muted);
+    color: var(--hackx-muted);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.hackx-switch-comp-btn:hover {
+    color: var(--hackx-text);
+    border-color: var(--hackx-text);
+}

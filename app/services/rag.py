@@ -96,7 +96,7 @@ def resolve_aliases(question: str) -> str:
     return q_lower
 
 
-async def answer_question(question: str, session_id: str | None = None) -> dict:
+async def answer_question(question: str, competition_id: str, session_id: str | None = None) -> dict:
     """
     6-tier RAG-powered pipeline with OpenAI failure resilience
     """
@@ -114,7 +114,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
             question = remaining_q
 
     # TIER 2: Response Cache Check
-    cached = get_cached_response(question)
+    cached = get_cached_response(question, competition_id)
     if cached:
         log_chat(question, cached, "CACHE", 1.0)
         update_session_history(session_id, "user", question)
@@ -125,7 +125,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
     resolved_query = resolve_aliases(question)
     if supabase:
         try:
-            faq_result = supabase.table("faq_exact").select("*").execute()
+            faq_result = supabase.table("faq_exact").select("*").eq("competition_id", competition_id).execute()
             for faq in faq_result.data:
                 # FAQ matching targets the exact question and its defined aliases
                 aliases = [faq["question"].lower().strip()] + [
@@ -134,7 +134,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
                 if (question.lower().strip() in aliases) or (resolved_query in aliases):
                     answer = faq["answer"]
                     log_chat(question, answer, "FAQ", 1.0)
-                    set_cached_response(question, answer, "faq_exact")
+                    set_cached_response(question, answer, competition_id, "faq_exact")
                     update_session_history(session_id, "user", question)
                     update_session_history(session_id, "assistant", answer)
                     return {"answer": answer, "source": "faq_exact", "tier": 4}
@@ -155,6 +155,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
                     "query_embedding": embedding,
                     "match_threshold": LLM_THRESHOLD,  # retrieve anything above low threshold
                     "match_count": 5,
+                    "filter_competition_id": competition_id
                 },
             ).execute()
             retrieved_chunks = vector_result.data or []
@@ -169,6 +170,8 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
                 if all_chunks.data:
                     scored_chunks = []
                     for chunk in all_chunks.data:
+                        if chunk.get("metadata", {}).get("competition_id") != competition_id:
+                            continue
                         if chunk.get("embedding"):
                             emb_val = chunk["embedding"]
                             if isinstance(emb_val, str):
@@ -238,7 +241,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
                     "VECTOR_EXACT_SECTION",
                     chunk["similarity"],
                 )
-                set_cached_response(question, formatted_answer, "vector_search")
+                set_cached_response(question, formatted_answer, competition_id, "vector_search")
                 update_session_history(session_id, "user", question)
                 update_session_history(session_id, "assistant", formatted_answer)
                 return {"answer": formatted_answer, "source": source, "tier": 5}
@@ -260,7 +263,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
             source = source_meta.get("source", "HackX Rulebook")
 
             log_chat(question, formatted_answer, "VECTOR", valid_chunk["similarity"])
-            set_cached_response(question, formatted_answer, "vector_search")
+            set_cached_response(question, formatted_answer, competition_id, "vector_search")
             update_session_history(session_id, "user", question)
             update_session_history(session_id, "assistant", formatted_answer)
             return {"answer": formatted_answer, "source": source, "tier": 5}
@@ -283,7 +286,7 @@ async def answer_question(question: str, session_id: str | None = None) -> dict:
 
             answer = await generate_response(prompt_context, question)
             log_chat(question, answer, "LLM", top_similarity)
-            set_cached_response(question, answer, "llm_synthesis")
+            set_cached_response(question, answer, competition_id, "llm_synthesis")
             update_session_history(session_id, "user", question)
             update_session_history(session_id, "assistant", answer)
             return {"answer": answer, "source": "llm_generated", "tier": 6}

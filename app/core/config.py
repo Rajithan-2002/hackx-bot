@@ -6,7 +6,8 @@ load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEYS_STR = os.getenv("OPENAI_API_KEYS", os.getenv("OPENAI_API_KEY", ""))
+OPENAI_API_KEYS = [k.strip() for k in OPENAI_API_KEYS_STR.split(",") if k.strip()]
 
 EMBED_MODEL = "text-embedding-3-small"
 LLM_MODEL = "gpt-4o-mini"
