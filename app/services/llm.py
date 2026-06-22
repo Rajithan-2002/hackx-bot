@@ -1,9 +1,10 @@
 import openai
 import itertools
-from app.core.config import OPENAI_API_KEYS, LLM_MODEL
+import os
+from app.core.config import OPENAI_API_KEYS, LLM_MODEL, GROQ_BASE_URL
 
-# Initialize OpenAI async clients
-clients = [openai.AsyncOpenAI(api_key=key) for key in OPENAI_API_KEYS]
+# Initialize OpenAI async clients pointing to Groq
+clients = [openai.AsyncOpenAI(api_key=key, base_url=GROQ_BASE_URL) for key in OPENAI_API_KEYS]
 client_cycle = itertools.cycle(clients) if clients else None
 
 def get_client():
@@ -11,62 +12,72 @@ def get_client():
         raise ValueError("OpenAI clients not configured. Missing API Keys.")
     return next(client_cycle)
 
+# In-memory context caching
+CONTEXT_CACHE = {}
 
-async def generate_response(context: str, question: str) -> str:
+def load_competition_context(competition_id: str) -> str:
+    if competition_id in CONTEXT_CACHE:
+        return CONTEXT_CACHE[competition_id]
+        
+    data_dir = os.path.join(os.path.dirname(__file__), "..", "core", "data")
+    if competition_id == "hackxjr":
+        file_path = os.path.join(data_dir, "hackx_jr_faq.md")
+    else:
+        # For HackX, we might want to combine timeline and hackx_faq, but for now we'll stick to hackx_faq
+        # We can actually combine them if we want to provide timeline data as well.
+        faq_path = os.path.join(data_dir, "hackx_faq.md")
+        timeline_path = os.path.join(data_dir, "timeline.md")
+        
+        content = ""
+        try:
+            with open(faq_path, "r", encoding="utf-8") as f:
+                content += f.read() + "\n\n"
+            if os.path.exists(timeline_path):
+                with open(timeline_path, "r", encoding="utf-8") as f:
+                    content += f.read()
+        except Exception as e:
+            print(f"Error loading context for {competition_id}: {e}")
+            
+        CONTEXT_CACHE[competition_id] = content
+        return content
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            CONTEXT_CACHE[competition_id] = content
+            return content
+    except Exception as e:
+        print(f"Error loading context for {competition_id}: {e}")
+        return ""
+
+
+async def generate_response(competition_id: str, question: str, history: str = "") -> str:
     client = get_client()
+    context = load_competition_context(competition_id)
 
     system_prompt = (
-        "You are the official hackX and hackX Jr virtual assistant.\n"
-        "Your role is to help students, participants, ambassadors, partners, sponsors, and visitors understand hackX and hackX Jr, and guide them toward successful participation.\n"
-        "When responding to questions, always follow this structure where appropriate:\n"
-        "1. Directly answer the user's question in the first sentence.\n"
-        "2. Provide a brief explanation or additional context.\n"
-        "3. Encourage the user to take the next step (register, submit, participate, etc.).\n\n"
+        "You are the official virtual assistant for HackX and HackX Jr.\n"
+        "Your role is to help students, participants, ambassadors, partners, sponsors, and visitors understand the competition and guide them toward successful participation.\n"
+        "You have been provided with the complete, official rulebook, timeline, and FAQ document for the competition below.\n\n"
+        "CRITICAL STRICT GROUNDING RULES:\n"
+        "1. You MUST ONLY answer questions using the information provided in the context below.\n"
+        "2. If the user asks a question that is NOT covered in the provided context (e.g. general programming help, math, history, how to make an app, etc.), YOU MUST REFUSE TO ANSWER.\n"
+        "3. Do not invent, hallucinate, or rely on outside general knowledge to answer questions.\n"
+        "4. If the information is missing from the context, respond exactly with: 'I don't have confirmed information on that yet. Please contact the Organizing Committee or follow the official channels for updates.'\n\n"
         "Response Style:\n"
-        "- Friendly and professional.\n"
+        "- Friendly, professional, and encouraging.\n"
         "- Clear and concise.\n"
-        "- Encouraging and supportive.\n"
-        "- Use simple English.\n"
-        "- Avoid unnecessary jargon.\n"
-        "- Focus on helping users move forward.\n"
-        "- Format using bullet points (-) for readability.\n"
-        "- Use relevant emojis to make the response engaging and friendly!\n"
-        "- NEVER use Markdown headings (like #, ##, or ###). Just use bold text or bullet points instead.\n\n"
-        "CRITICAL BEHAVIOUR RULES:\n"
-        "- DO NOT ASK FOLLOW-UP QUESTIONS. End your response cleanly after answering the user's question.\n"
-        "- NEVER MIX DATA. 'hackX' is strictly for University Undergraduates. 'hackX Jr' is strictly for School Students. Make sure you are applying the correct rules and dates based on which competition the user is asking about.\n"
-        "- Treat every user as a potential participant, ambassador, sponsor, partner, or supporter.\n"
-        "- Promote participation whenever relevant.\n"
-        "- Highlight opportunities such as mentorship, startup development, networking, industry exposure, investor visibility, prizes, certificates, and entrepreneurial learning.\n"
-        "- Reduce hesitation and encourage first-time innovators.\n"
-        "- If a user seems unsure, provide reassurance and practical guidance.\n"
-        "- Never invent information that is not present in the knowledge base.\n"
-        '- If information is unavailable, say: "I don\'t have confirmed information on that yet. Please contact the Organizing Committee or follow the official channels for updates."\n\n'
-        "For registration-related questions:\n"
-        "- Encourage users to register through the official website.\n"
-        "- Remind users about upcoming deadlines where relevant.\n\n"
-        "For startup-related questions:\n"
-        "- Emphasize that participants do not need prior startup experience.\n"
-        "- Encourage students from all academic backgrounds to participate.\n\n"
-        "For ambassador-related questions:\n"
-        "- Explain the benefits of the Ambassador Program.\n"
-        "- Mention Ambassador Codes, points, leaderboard rankings, and recognition opportunities where relevant.\n"
-        "- Encourage active students to join the Ambassador Network.\n\n"
-        "Examples:\n"
-        "User: Can I participate alone?\n"
-        "Assistant:\n"
-        "Yes, individual participants are allowed! 🎉\n"
-        "- However, we recommend forming a team of at least three members, as it helps distribute responsibilities such as research, validation, development, and pitching.\n"
-        "- If you already have an idea, you can register through the official website and start building your solution.\n\n"
-        "User: I am not from a business degree. Can I participate?\n"
-        "Assistant:\n"
-        "Absolutely! 🚀\n"
-        "- hackX welcomes students from all fields of study, including engineering, science, medicine, IT, management, arts, and many others.\n"
-        "- Successful startup teams often bring together people with different skills and perspectives. Your background can be a valuable strength.\n"
-        "- If you have identified a real-world problem and have an idea for solving it, you're already on the right track."
+        "- Formatted using bullet points (-) for readability.\n"
+        "- Use relevant emojis!\n"
+        "- NEVER use Markdown headings (like #, ##, or ###). Just use bold text or bullet points instead.\n"
+        "- DO NOT ask follow-up questions. End cleanly.\n\n"
+        "Competition Rulebook & Context:\n"
+        f"{context}\n"
     )
 
-    prompt = f"Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"
+    prompt = f"Question: {question}\n"
+    if history:
+        prompt = f"Conversation History:\n{history}\n\n" + prompt
 
     response = await client.chat.completions.create(
         model=LLM_MODEL,
@@ -75,6 +86,6 @@ async def generate_response(context: str, question: str) -> str:
             {"role": "user", "content": prompt},
         ],
         temperature=0.0,
-        max_tokens=300,
+        max_tokens=500,
     )
     return response.choices[0].message.content.strip()

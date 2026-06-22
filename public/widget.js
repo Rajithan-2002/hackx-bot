@@ -260,10 +260,41 @@
         const msg = document.createElement('div');
         msg.className = `hackx-msg ${sender}`;
         
-        let content = text.replace(/\n/g, '<br/>');
-        content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // Convert Markdown links [text](url) to HTML anchors
-        content = content.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: var(--hackx-cyan); text-decoration: underline; font-weight: 500;">$1</a>');
+        let lines = text.split('\n');
+        let htmlLines = [];
+        let inList = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            
+            // Bold
+            line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Links
+            line = line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: var(--hackx-cyan); text-decoration: underline; font-weight: 500;">$1</a>');
+            
+            let listMatch = line.trim().match(/^[-*]\s+(.*)/);
+            if (listMatch) {
+                if (!inList) {
+                    htmlLines.push('<ul style="margin: 8px 0; padding-left: 20px;">');
+                    inList = true;
+                }
+                htmlLines.push('<li style="margin-bottom: 4px;">' + listMatch[1] + '</li>');
+            } else {
+                if (inList) {
+                    htmlLines.push('</ul>');
+                    inList = false;
+                }
+                htmlLines.push(line);
+            }
+        }
+        if (inList) {
+            htmlLines.push('</ul>');
+        }
+        
+        let content = htmlLines.join('<br/>');
+        // Clean up <br/> tags around lists
+        content = content.replace(/<br\/>\s*<ul/g, '<ul').replace(/<\/ul>\s*<br\/>/g, '</ul>');
+        
         msg.innerHTML = content;
         
         // Add meta info (Debug Badge only - Source info completely removed from UI)
