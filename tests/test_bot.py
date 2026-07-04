@@ -1,6 +1,7 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from app.services.rag import answer_question
+
 
 @pytest.mark.asyncio
 @patch("app.services.rag.get_cached_response")
@@ -66,12 +67,53 @@ def test_rate_limiter_integration():
         # Make 30 requests - they should all succeed (200 OK)
         for _ in range(30):
             response = client.post(
-                "/api/chat", json={"message": "hello", "competition_id": "hackx", "session_id": "test"}
+                "/api/chat",
+                json={
+                    "message": "hello",
+                    "competition_id": "hackx",
+                    "session_id": "test",
+                },
             )
             assert response.status_code == 200
 
         # The 31st request should be rate limited (429 Too Many Requests)
         response = client.post(
-            "/api/chat", json={"message": "hello", "competition_id": "hackx", "session_id": "test"}
+            "/api/chat",
+            json={"message": "hello", "competition_id": "hackx", "session_id": "test"},
         )
         assert response.status_code == 429
+
+
+def test_direct_endpoints():
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    client = TestClient(app)
+
+    with patch("app.main.answer_question") as mock_answer:
+        mock_answer.return_value = {
+            "answer": "Direct hackx response",
+            "source": "llm_generated",
+            "tier": 2,
+        }
+
+        response = client.post(
+            "/api/chat/x", json={"message": "timeline check", "session_id": "test_x"}
+        )
+        assert response.status_code == 200
+        assert response.json()["answer"] == "Direct hackx response"
+        mock_answer.assert_called_with("timeline check", "hackx", "test_x")
+
+    with patch("app.main.answer_question") as mock_answer:
+        mock_answer.return_value = {
+            "answer": "Direct hackxjr response",
+            "source": "llm_generated",
+            "tier": 2,
+        }
+
+        response = client.post(
+            "/api/chat/jr", json={"message": "jr rules", "session_id": "test_jr"}
+        )
+        assert response.status_code == 200
+        assert response.json()["answer"] == "Direct hackxjr response"
+        mock_answer.assert_called_with("jr rules", "hackxjr", "test_jr")

@@ -9,62 +9,8 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 OPENAI_API_KEYS_STR = os.getenv("OPENAI_API_KEYS", os.getenv("OPENAI_API_KEY", ""))
 OPENAI_API_KEYS = [k.strip() for k in OPENAI_API_KEYS_STR.split(",") if k.strip()]
 
-EMBED_MODEL = "text-embedding-3-small" # Deprecated
 LLM_MODEL = "llama-3.3-70b-versatile"
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-
-# Similarity thresholds (Deprecated)
-EXACT_MATCH_THRESHOLD = 0.70
-
-# Configuration Flags for testing/resilience
-ENABLE_LLM_FALLBACK = os.getenv("ENABLE_LLM_FALLBACK", "True").lower() == "true"
-ENABLE_RETRIEVAL_ONLY_MODE = (
-    os.getenv("ENABLE_RETRIEVAL_ONLY_MODE", "True").lower() == "true"
-)
-
-# Domain Guard Configuration
-DOMAIN_KEYWORDS = [
-    "hackx",
-    "hackx jr",
-    "registration",
-    "eligibility",
-    "timeline",
-    "venue",
-    "judging",
-    "sponsors",
-    "rules",
-    "submission",
-    "team",
-    "contact",
-    "prize",
-    "deadline",
-    "member",
-    "student",
-    "submit",
-    "idea",
-    "proposal",
-    "pitch",
-    "video",
-    "prototype",
-    "workshop",
-    "seminar",
-    "challenge",
-    "award",
-    "cash",
-    "certificate",
-    "startup",
-    "youtube",
-    "link",
-    "unlisted",
-    "business",
-    "innovation",
-    "entrepreneur",
-    "participate",
-    "register",
-    "join",
-    "competition",
-    "objective",
-]
 
 # Initialize supabase client
 supabase: Client = (

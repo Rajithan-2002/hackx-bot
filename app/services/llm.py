@@ -4,21 +4,26 @@ import os
 from app.core.config import OPENAI_API_KEYS, LLM_MODEL, GROQ_BASE_URL
 
 # Initialize OpenAI async clients pointing to Groq
-clients = [openai.AsyncOpenAI(api_key=key, base_url=GROQ_BASE_URL) for key in OPENAI_API_KEYS]
+clients = [
+    openai.AsyncOpenAI(api_key=key, base_url=GROQ_BASE_URL) for key in OPENAI_API_KEYS
+]
 client_cycle = itertools.cycle(clients) if clients else None
+
 
 def get_client():
     if not client_cycle:
         raise ValueError("OpenAI clients not configured. Missing API Keys.")
     return next(client_cycle)
 
+
 # In-memory context caching
 CONTEXT_CACHE = {}
+
 
 def load_competition_context(competition_id: str) -> str:
     if competition_id in CONTEXT_CACHE:
         return CONTEXT_CACHE[competition_id]
-        
+
     data_dir = os.path.join(os.path.dirname(__file__), "..", "core", "data")
     if competition_id == "hackxjr":
         file_path = os.path.join(data_dir, "hackx_jr_faq.md")
@@ -27,7 +32,7 @@ def load_competition_context(competition_id: str) -> str:
         # We can actually combine them if we want to provide timeline data as well.
         faq_path = os.path.join(data_dir, "hackx_faq.md")
         timeline_path = os.path.join(data_dir, "timeline.md")
-        
+
         content = ""
         try:
             with open(faq_path, "r", encoding="utf-8") as f:
@@ -37,7 +42,7 @@ def load_competition_context(competition_id: str) -> str:
                     content += f.read()
         except Exception as e:
             print(f"Error loading context for {competition_id}: {e}")
-            
+
         CONTEXT_CACHE[competition_id] = content
         return content
 
@@ -51,8 +56,9 @@ def load_competition_context(competition_id: str) -> str:
         return ""
 
 
-async def generate_response(competition_id: str, question: str, history: str = "") -> str:
-    client = get_client()
+async def generate_response(
+    competition_id: str, question: str, history: str = ""
+) -> str:
     context = load_competition_context(competition_id)
 
     system_prompt = (
@@ -79,13 +85,30 @@ async def generate_response(competition_id: str, question: str, history: str = "
     if history:
         prompt = f"Conversation History:\n{history}\n\n" + prompt
 
-    response = await client.chat.completions.create(
-        model=LLM_MODEL,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.0,
-        max_tokens=500,
-    )
-    return response.choices[0].message.content.strip()
+    num_clients = len(clients) if clients else 0
+    if num_clients == 0:
+        raise ValueError("OpenAI clients not configured. Missing API Keys.")
+
+    last_error = None
+    for attempt in range(num_clients):
+        client = get_client()
+        try:
+            response = await client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.0,
+                max_tokens=500,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            print(
+                f"API Client attempt {attempt + 1}/{num_clients} failed with error: {e}"
+            )
+            last_error = e
+
+    if last_error:
+        raise last_error
+    raise ValueError("All configured API clients failed to generate a response.")

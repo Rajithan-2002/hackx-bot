@@ -1,72 +1,21 @@
--- Enable pgvector
-create extension if not exists vector;
-
--- 1. Exact FAQ table (for tier 4 matching — no embedding needed)
-create table faq_exact (
-  id uuid primary key default gen_random_uuid(),
-  question text not null,
-  answer text not null,
-  aliases jsonb default '[]',
-  created_at timestamptz default now()
+-- 1. Chat logs table (for Analytics)
+CREATE TABLE IF NOT EXISTS chat_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  route_used TEXT NOT NULL, -- GREETING, CACHE, LLM, ERROR
+  confidence FLOAT DEFAULT 0.0,
+  timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Document chunks table (for tier 5 vector search)
-create table document_chunks (
-  id uuid primary key default gen_random_uuid(),
-  chunk_text text not null,
-  metadata jsonb,
-  embedding vector(1536),   -- text-embedding-3-small outputs 1536 dims
-  created_at timestamptz default now()
+-- 2. Chat cache table (for response caching)
+CREATE TABLE IF NOT EXISTS chat_cache (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question_hash TEXT NOT NULL UNIQUE,
+  answer TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'cache',
+  usage_count INT DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  last_used TIMESTAMPTZ DEFAULT NOW()
 );
-
--- 3. Chat logs table (for Analytics)
-create table chat_logs (
-  id uuid primary key default gen_random_uuid(),
-  question text not null,
-  answer text not null,
-  route_used text not null, -- FAQ, VECTOR, LLM, OUT_OF_SCOPE
-  confidence float default 0.0,
-  timestamp timestamptz default now()
-);
-
--- 4. Chat cache table (for tier 2 Response Cache)
-create table chat_cache (
-  id uuid primary key default gen_random_uuid(),
-  question_hash text not null unique,
-  answer text not null,
-  source text not null default 'cache',
-  usage_count int default 1,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now(),
-  last_used timestamptz default now()
-);
-
--- Vector similarity search function
-create or replace function match_documents(
-  query_embedding vector(1536),
-  match_threshold float,
-  match_count int
-)
-returns table (
-  id uuid,
-  chunk_text text,
-  metadata jsonb,
-  similarity float
-)
-language sql stable
-as $$
-  select
-    id,
-    chunk_text,
-    metadata,
-    1 - (embedding <=> query_embedding) as similarity
-  from document_chunks
-  where 1 - (embedding <=> query_embedding) > match_threshold
-  order by embedding <=> query_embedding
-  limit match_count;
-$$;
-
--- Index for fast vector search
-create index on document_chunks
-using ivfflat (embedding vector_cosine_ops)
-with (lists = 100);

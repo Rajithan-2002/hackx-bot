@@ -1,19 +1,21 @@
 # HackX Assistant V1.0
 
-A professional, RAG-powered chatbot widget designed for the **HackX 11.0** (main hackathon) and **HackX Jr 9.0** (junior category) landing pages. 
+A professional, high-performance virtual assistant chatbot widget designed for the **HackX 11.0** (main category) and **HackX Jr 9.0** (junior category) landing pages. 
 
-The backend is engineered using an optimized **LLM-last Architecture** to provide instantaneous responses for common queries, maximize local cache efficiency, and minimize OpenAI API cost overheads.
+The backend is built around a streamlined **3-Tier Groq Context Stuffing Architecture** that bypasses complex vector similarity index computations. It provides fast, contextually grounded answers directly utilizing local rulebook documents while caching common queries in Supabase to minimize API overhead and latency.
 
 ---
 
 ## 🚀 Key Features
 
-* **6-Tier Response Pipeline**: Progresses from zero-cost matching (Greetings, local FAQs, vector caches) up to OpenAI vector search and GPT-4o-Mini fallback.
-* **Supabase Integration**: Stores vector embeddings, exact match FAQs, caching logs, and conversation audits.
-* **Dynamic Widget UI**: A glassmorphic, mascot-guided widget themed to match the `hackx11` landing page colors and TT Hoves Pro typography.
+* **3-Tier Response Pipeline**: Progresses from static zero-cost greetings, through a database-backed response cache, up to direct Groq context-stuffing generation.
+* **Groq Integration & Context Stuffing**: Feeds the complete markdown rulebooks directly into Groq's high-speed API (e.g., Llama 3) for accurate synthesis without embedding retrieval.
+* **API Key Rotation**: Automatically cycles through a comma-separated list of Groq/OpenAI keys to prevent rate limit bottlenecks.
+* **Multi-Competition Isolation**: Uses `competition_id` (e.g., `hackx` or `hackxjr`) to isolate system prompts, rulebooks, and response caches.
+* **Supabase Integration**: Manages response caching (`chat_cache`) and analytical logs (`chat_logs`) to monitor performance.
+* **Dynamic Widget UI**: A glassmorphic, mascot-guided widget themed to match the `hackx11` landing page colors and typography.
 * **Robust Rate Limiting**: Powered by `slowapi` to protect routes from abuse (default 30 requests/minute per client IP).
 * **Containerization Ready**: Includes `Dockerfile` and `docker-compose.yml` for instant, isolated deployment.
-* **Fully Tested**: Full integration test suite mapping rate limiting, custom configurations, and routing fallbacks.
 
 ---
 
@@ -26,36 +28,33 @@ hackx-bot/
 ├── app/
 │   ├── core/
 │   │   ├── database/
-│   │   │   ├── init_db.sql # Database schema definitions (PostgreSQL + pgvector)
+│   │   │   ├── init_db.sql # Idempotent schema setup (PostgreSQL + pgvector)
 │   │   │   └── schema.sql  # Backup base schema statements
 │   │   ├── data/
-│   │   │   ├── aliases.json      # Mapping of alternative terms/synonyms
 │   │   │   ├── hackx_faq.md      # FAQ document for HackX 11.0
 │   │   │   ├── hackx_jr_faq.md   # FAQ document for HackX Jr 9.0
 │   │   │   ├── sample_faq.md     # Setup example FAQ document
 │   │   │   └── timeline.md       # Timeline and schedules document
-│   │   └── config.py       # Configuration loader & client initialization (Supabase, variables)
+│   │   └── config.py       # Config loader & client initialization (Supabase, rotation keys)
 │   ├── middleware/
 │   │   └── rate_limit.py   # SlowAPI limiter instance declaration
-│   ├── public/             # Static files served by FastAPI (Widget files & mascot assets)
-│   │   ├── assets/         # Mascot PNG images mapping launcher states
-│   │   ├── index.html      # Local widget testing/mockup page
-│   │   ├── widget.css      # Floating chatbot widget styles (Glassmorphic theme)
-│   │   └── widget.js       # Widget injection script and greeting animations
 │   ├── services/
-│   │   ├── cache.py        # In-database response caching logic (Tier 2)
-│   │   ├── domain_guard.py # Input topic filtering & validation logic (Tier 1)
-│   │   ├── embeddings.py   # OpenAI vector embedding generator
-│   │   ├── llm.py          # Prompt template & OpenAI API interactions
-│   │   └── rag.py          # Core 6-tier pipeline router
+│   │   ├── cache.py        # In-database response caching logic (Tier 1)
+│   │   ├── llm.py          # Prompt template, local doc loading, & Groq client rotation
+│   │   └── rag.py          # Core 3-tier pipeline router
 │   ├── scripts/
-│   │   ├── ingest.py       # Vector ingestion and FAQ seeding script
-│   │   └── setup_db.py     # Automatic database table and extension creator
+│   │   ├── ingest.py       # [Deprecated] Ingestion print placeholder
+│   │   └── setup_db.py     # Idempotent database table creator
 │   ├── __init__.py
-│   └── main.py             # FastAPI application router, static mounting & exception handlers
+│   └── main.py             # FastAPI app, static routes mounting & exception handlers
+├── public/                 # Static files (Served by FastAPI)
+│   ├── assets/             # Mascot PNG images mapping launcher states
+│   ├── index.html          # Local widget testing/mockup page
+│   ├── widget.css          # Floating chatbot widget styles (Glassmorphic theme)
+│   └── widget.js           # Widget injection script, markdown parsing, and greetings
 ├── tests/
-│   └── test_bot.py         # Automated pytest test cases (9 unit tests + 1 integration test)
-├── Dockerfile              # Deployment Dockerfile (python:3.11-slim)
+│   └── test_bot.py         # Automated pytest test cases (5 unit and integration tests)
+├── Dockerfile              # Deployment Dockerfile (python:3.11-slim, two-stage build)
 ├── docker-compose.yml      # Orchestration compose file
 ├── .dockerignore           # Excluded contexts for docker builds
 ├── .env.example            # Environment variables example reference
@@ -65,48 +64,29 @@ hackx-bot/
 
 ---
 
-## 🛠️ The 6-Tier Pipeline Architecture
+## 🛠️ The 3-Tier Pipeline Architecture
 
-The chatbot processes every message through the following sequence, returning a response as early as possible to minimize costs:
+Every incoming question is routed through the following pipeline to balance response speed and API cost:
 
 ```
-User Query ➔ [Tier 1: Domain Guard] ➔ [Tier 2: Response Cache] ➔ [Tier 3: Synonyms/Aliases] 
-            ➔ [Tier 4: Exact FAQ] ➔ [Tier 5: Vector Search] ➔ [Tier 6: LLM / Fallback]
+User Query ➔ [Tier 0: Greeting Detection] ➔ [Tier 1: Response Cache] ➔ [Tier 2: Groq Context Stuffing]
 ```
 
-1. **Tier 1: Domain Guard & Greetings**: Filters out out-of-scope requests using keyword checking. Matches common greetings (e.g. "hi", "hello") immediately with static, zero-cost greeting answers without hitting OpenAI.
-2. **Tier 2: Response Cache (`chat_cache`)**: Searches the database for exact MD5 hashes of prior questions. If hit, returns the cached answer instantly and increments the usage count.
-3. **Tier 3: Synonym Expansion (`aliases.json`)**: Expands keywords (e.g. "group size" ➔ "team size") to increase the success of exact FAQ lookups.
-4. **Tier 4: Exact FAQ Lookup (`faq_exact`)**: Checks if the query matches predefined FAQ questions or their aliases.
-5. **Tier 5: High-Confidence Vector Search (`document_chunks`)**: Generates an embedding of the question and queries the Supabase `match_documents` function. If similarity is `≥ 0.70`, it directly returns the closest text chunk.
-6. **Tier 6: LLM Synthesis & Fallback**: 
-   * **LLM Synthesis (Active by default)**: Passes the closest retrieved context chunks along with the user's recent **Conversation History** to GPT-4o-Mini to generate a custom response.
-   * **Retrieval-Only Fallback**: If OpenAI is unavailable or LLM fallback is toggled off, it returns a formatted summary of the top-retrieved context chunks.
+1. **Tier 0: Greeting Detection (Zero Cost)**: Matches common greetings statically (e.g. "hi", "hello") without calling any external LLM APIs.
+2. **Tier 1: Response Cache (`chat_cache`)**: Searches the database for exact hashes of prior questions (scoped to the specific `competition_id`). If hit, returns the cached answer instantly.
+3. **Tier 2: Groq Context Stuffing**: 
+   * Loads the competition-specific Markdown file directly from `app/core/data/` (e.g., combining FAQ and timeline files).
+   * Passes the full rulebook, the conversation history, and the new question directly into Groq's high-speed completion API.
+   * Caches the output in the database and logs the audit entry.
 
 ---
 
 ## 🗄️ Database Tables Schema
 
-The system initializes 4 primary tables in Supabase:
-
-### `faq_exact`
-Stores exact question-answer mappings.
-* `id` (UUID, Primary Key)
-* `question` (Text)
-* `answer` (Text)
-* `aliases` (JSONB)
-* `created_at` (Timestamp)
-
-### `document_chunks`
-Stores segmented source documents and their computed embeddings.
-* `id` (UUID, Primary Key)
-* `chunk_text` (Text)
-* `metadata` (JSONB)
-* `embedding` (Vector, 1536 dimensions)
-* `created_at` (Timestamp)
+The system initializes the following tables in Supabase:
 
 ### `chat_cache`
-Stores successful answers mapped by the question's MD5 hash.
+Stores successful answers mapped by the question's MD5 hash (incorporating the `competition_id`).
 * `id` (UUID, Primary Key)
 * `question_hash` (Text, Unique)
 * `answer` (Text)
@@ -117,13 +97,15 @@ Stores successful answers mapped by the question's MD5 hash.
 * `last_used` (Timestamp)
 
 ### `chat_logs`
-Audit logs of all inquiries for analytics.
+Audit logs of all chatbot inquiries for analytics.
 * `id` (UUID, Primary Key)
 * `question` (Text)
 * `answer` (Text)
 * `route_used` (Text)
 * `confidence` (Float)
 * `timestamp` (Timestamp)
+
+*Note: The `document_chunks` and `faq_exact` tables remain in the schema setup for backward compatibility but are not used at runtime by the new Groq Context Stuffing pipeline.*
 
 ---
 
@@ -139,8 +121,11 @@ SUPABASE_KEY=your-supabase-service-role-or-anon-key
 # Supabase Postgres URL (required for setup_db.py schema initializations)
 SUPABASE_DB_URL=postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres
 
-# OpenAI Credentials
-OPENAI_API_KEY=sk-proj-your-api-key
+# Groq / OpenAI Configuration
+# Use OPENAI_API_KEYS with comma-separated keys for API round-robin rotation,
+# or OPENAI_API_KEY for a single key.
+OPENAI_API_KEY=gsk_your-single-groq-api-key
+OPENAI_API_KEYS=gsk_key1,gsk_key2,gsk_key3
 
 # Testing & Cost Optimization Flags
 ENABLE_LLM_FALLBACK=True
@@ -159,15 +144,15 @@ ENABLE_RETRIEVAL_ONLY_MODE=True
    ```
 
 2. **Initialize Database Schema**:
-   Run the setup script to construct tables and create the vector matching function:
+   Run the setup script to construct tables on Supabase:
    ```bash
    python -m app.scripts.setup_db
    ```
 
-3. **Ingest Knowledge base & FAQs**:
-   Runs vector parsing and uploads data to Supabase:
+3. **Running Database Clears**:
+   To purge caches and query logs (useful for staging resets):
    ```bash
-   python -m app.scripts.ingest
+   python clear_db.py
    ```
 
 4. **Run Server Locally**:
@@ -180,10 +165,10 @@ ENABLE_RETRIEVAL_ONLY_MODE=True
 
 ### 2. Running with Docker
 
-Build and run the entire backend containerized using Docker Compose:
+Build and run the entire backend containerized:
 
 ```bash
-# Build and run container
+# Build and run containers
 docker compose up -d --build
 
 # View container logs
@@ -194,7 +179,7 @@ docker compose logs -f
 
 ## 💬 Widget Embedding
 
-To embed the floating assistant on any website, copy and paste this script tag right before the closing `</body>` tag:
+To embed the floating assistant widget on any website, copy and paste this script tag right before the closing `</body>` tag:
 
 ```html
 <!-- Replace localhost with your production server URL when deploying -->
@@ -202,7 +187,7 @@ To embed the floating assistant on any website, copy and paste this script tag r
 ```
 
 ### Widget UI Customization
-The widget colors, buttons, and scrolls can be customized in [app/public/widget.css](file:///d:/HackX/hackx-bot/app/public/widget.css). Custom properties are exposed under `:root` for simple changes:
+Colors, buttons, and scrolls can be customized in [public/widget.css](file:///d:/HackX/hackx-bot/public/widget.css). Custom properties are exposed under `:root`:
 
 ```css
 :root {

@@ -7,8 +7,6 @@ from pydantic import BaseModel
 from app.core.config import (
     supabase,
     OPENAI_API_KEYS,
-    ENABLE_LLM_FALLBACK,
-    ENABLE_RETRIEVAL_ONLY_MODE,
 )
 from app.services.rag import answer_question
 from app.middleware.rate_limit import limiter
@@ -47,6 +45,11 @@ class ChatRequest(BaseModel):
     session_id: str | None = None
 
 
+class SimpleChatRequest(BaseModel):
+    message: str
+    session_id: str | None = None
+
+
 @app.post("/api/chat")
 @app.post("/chat")
 @limiter.limit("30/minute")
@@ -56,7 +59,43 @@ async def chat(chat_request: ChatRequest, request: Request):
     if not chat_request.competition_id:
         raise HTTPException(status_code=400, detail="Competition selection required")
 
-    result = await answer_question(chat_request.message, chat_request.competition_id, chat_request.session_id)
+    result = await answer_question(
+        chat_request.message, chat_request.competition_id, chat_request.session_id
+    )
+    return {
+        "answer": result["answer"],
+        "source": result["source"],
+        "tier": result["tier"],
+    }
+
+
+@app.post("/api/chat/x")
+@app.post("/chat/x")
+@limiter.limit("30/minute")
+async def chat_x(chat_request: SimpleChatRequest, request: Request):
+    if not chat_request.message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty.")
+
+    result = await answer_question(
+        chat_request.message, "hackx", chat_request.session_id
+    )
+    return {
+        "answer": result["answer"],
+        "source": result["source"],
+        "tier": result["tier"],
+    }
+
+
+@app.post("/api/chat/jr")
+@app.post("/chat/jr")
+@limiter.limit("30/minute")
+async def chat_jr(chat_request: SimpleChatRequest, request: Request):
+    if not chat_request.message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty.")
+
+    result = await answer_question(
+        chat_request.message, "hackxjr", chat_request.session_id
+    )
     return {
         "answer": result["answer"],
         "source": result["source"],
@@ -68,47 +107,25 @@ async def chat(chat_request: ChatRequest, request: Request):
 @app.get("/health")
 async def health():
     supabase_ok = False
-    vector_ok = False
     cache_ok = False
-    openai_ok = bool(openai_clients and OPENAI_API_KEYS)
+    groq_ok = bool(openai_clients and OPENAI_API_KEYS)
 
-    # Check Supabase, Vector Search, and Cache
+    # Check database and cache connection status
     if supabase:
         try:
-            supabase.table("faq_exact").select("id").limit(1).execute()
-            supabase_ok = True
-        except Exception:
-            pass
-
-        try:
-            supabase.table("document_chunks").select("id").limit(1).execute()
-            vector_ok = True
-        except Exception:
-            pass
-
-        try:
             supabase.table("chat_cache").select("id").limit(1).execute()
+            supabase_ok = True
             cache_ok = True
         except Exception:
             pass
 
-    # Mode calculation
-    mode = "standard"
-    if not ENABLE_LLM_FALLBACK or not openai_ok:
-        if ENABLE_RETRIEVAL_ONLY_MODE:
-            mode = "retrieval_only"
-        else:
-            mode = "degraded"
-
-    is_healthy = supabase_ok and (openai_ok or ENABLE_RETRIEVAL_ONLY_MODE)
+    is_healthy = supabase_ok and groq_ok
 
     return {
         "status": "healthy" if is_healthy else "unhealthy",
         "supabase": supabase_ok,
-        "openai": openai_ok,
-        "vector_search": vector_ok,
+        "groq": groq_ok,
         "cache": cache_ok,
-        "mode": mode,
     }
 
 
