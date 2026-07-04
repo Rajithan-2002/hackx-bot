@@ -53,10 +53,10 @@ You can easily register online by visiting our official website at jr.hackx.lk. 
 Yes. Participation is completely free, and no fee is charged from competitors at any stage of the competition.
 
 **When does registration open?**
-Registrations officially open on 23rd June 2026.
+Registrations officially open on 4th July 2026.
 
 **What is the registration deadline?**
-Make sure to lock in your spot early! The registration window will close on 28th July 2026. Late entries will not be accepted, so keep an eye on the date.
+Make sure to lock in your spot early! The registration window will close on 3rd August 2026. Late entries will not be accepted, so keep an eye on the date.
 
 **What information is needed for registration?**
 To complete your registration, you will need to accurately provide the following details:
@@ -144,7 +144,7 @@ Proposal Submission
 A proposal is a formal document that explains your project or startup idea for hackX Jr. 9.0. It clearly describes the problem you are solving, your target audience, how your solution works, why it is innovative, and how it could become sustainable. The official proposal template will be provided on our website to guide you through the required format.
 
 **When can we submit our proposal, and what is the deadline?**
-The proposal submission window opens on 31st July 2026 and closes on 14th August 2026. Please make sure to submit before the deadline, as late or partially completed submissions will be rejected.
+The proposal submission window opens on 1st August 2026 and closes on 14th August 2026. Please make sure to submit before the deadline, as late or partially completed submissions will be rejected.
 
 **What should be included in the proposal?**
 Your proposal must strictly follow the official template and guidelines provided by the organizing committee on the website. The template outlines all the required sections, layouts, and the 3,500-word limit.
@@ -173,7 +173,7 @@ To modify a submission, you must carefully follow the specific instructions prov
 It is an introductory session designed to guide school students on how to brainstorm creative ideas, write a winning project proposal, and understand the core concepts of innovation. It's the perfect starting point for your hackX Jr. 9.0 journey.
 
 **When is the Awareness Session?**
-The session will take place on 3rd July 2026.
+The session will take place on 31st July 2026.
 
 **Where will the Awareness Session be held?**
 It will be held physically at the Department of Industrial Management, University of Kelaniya.
@@ -194,11 +194,11 @@ Tools & Techniques: An introduction to modern tech tools and industry insights t
 **Will the online broadcast allow us to ask questions?**
 Yes.The online session will feature a live Q&A segment where online participants can type in their questions regarding registration, idea limits, or proposal guidelines, and the organizing team will answer them live.
 
-**If I miss the live Awareness Session on 3rd July, can I still watch it later?**
-Yes. A recording of the session will remain available online so that students who couldn't make it to the physical venue or missed the live stream can catch up and learn how to write a winning proposal before the submission portal opens on 31st July.
+**If I miss the live Awareness Session on 31st July, can I still watch it later?**
+Yes. A recording of the session will remain available online so that students who couldn't make it to the physical venue or missed the live stream can catch up and learn how to write a winning proposal before the submission portal opens on 1st August.
 
 **What are the event timings for the Awareness Session?**
-The Awareness Session will be held from 9:00 AM to 1:30 PM on 3rd July 2026. Please make sure to arrive early if you are attending physically at the University of Kelaniya, or log in on time if you are joining us online, so you don't miss any of the expert guidance.
+The Awareness Session will be held from 9:00 AM to 1:30 PM on 31st July 2026. Please make sure to arrive early if you are attending physically at the University of Kelaniya, or log in on time if you are joining us online, so you don't miss any of the expert guidance.
 
 ## Language & Translation Guidelines
 
