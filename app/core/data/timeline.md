@@ -3,9 +3,9 @@
 ## Timeline and Important Dates
 
 **ideaX for Universities**
-- **Registration Open**: 23 June (Tuesday)
-- **Registration Close**: 28 July (Tuesday)
-- **Proposal Submission Open**: 31 July (Friday)
+- **Registration Open**: 4 July (Saturday)
+- **Registration Close**: 3 August (Monday)
+- **Proposal Submission Open**: 1 August (Saturday)
 - **Proposal Submission Close**: 14 August (Friday)
 - **Semi-Finalists Announcement**: 09 September (Wednesday)
 - **ideaX 30 Teams** (Best 5 teams of ideasprint + 25 other university teams): 03 October (Saturday)

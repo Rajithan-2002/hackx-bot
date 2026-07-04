@@ -59,7 +59,7 @@ Teams can register through the registration portal in the official website (hack
 Yes. Participation is completely free, and no fee is charged from competitors at any stage of the competition.
 
 **When does registration open?**
-23rd June 2026
+4th July 2026
 
 **Can I edit my registration details after submission?**
 Yes, within the allowed period. Please contact the Organizing Committee for further details.
