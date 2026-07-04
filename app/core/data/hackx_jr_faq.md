@@ -47,7 +47,7 @@ It is completely optional. You are not legally required to have a teacher to reg
 ## Registrations
 
 **How do I register my team?**
-You can easily register online by visiting our official website at jr.hackx.lk. Just head over to the registration page during the open registration period and fill out the online form.
+You can easily register online by visiting our official website at hackxjr.lk. Just head over to the registration page during the open registration period and fill out the online form.
 
 **Is registration free?**
 Yes. Participation is completely free, and no fee is charged from competitors at any stage of the competition.
@@ -66,7 +66,7 @@ The full names and information of all team members
 Optional but Highly Recommended: The name and details of your Teacher-in-Charge to ensure your team has formal backing and support.
 
 **Does every team member need to register?**
-No, you don't all need to sign up separately. Registration by a single team member (such as the team leader) is completely sufficient for the whole group. Just ensure that whoever fills out the form on jr.hackx.lk has the correct and complete details for everyone on the team.
+No, you don't all need to sign up separately. Registration by a single team member (such as the team leader) is completely sufficient for the whole group. Just ensure that whoever fills out the form on hackxjr.lk has the correct and complete details for everyone on the team.
 
 **Can I edit my registration after submitting it?**
 The portal does not allow you to change details on your own once submitted. If you made a mistake or need to update your information, please reach out directly to the organizing committee for assistance, and they will help you fix it.But, within the allowed period.
@@ -162,7 +162,7 @@ The proposal must be uploaded as a PDF document and must be written in English o
 Yes, the maximum word limit is 3,500 words. You are highly encouraged to include diagrams, images, charts, and other relevant visuals to help explain your idea clearly.
 
 **Where can I find the proposal template, and can I see it beforehand?**
-The official proposal template will be made available on our official website (jr.hackx.lk) right when the proposal submission period begins.
+The official proposal template will be made available on our official website (hackxjr.lk) right when the proposal submission period begins.
 
 **Can I resubmit or make changes to my proposal after uploading?**
 To modify a submission, you must carefully follow the specific instructions provided directly on the submission platform. Keep in mind that incomplete proposals will be automatically rejected, so ensure everything is finalized before uploading.
@@ -260,7 +260,7 @@ While you don't need a 100% flawless market-ready product, teams making it to th
 ## Grand Finals & Mentorship
 
 **When and where will the Grand Final of hackX Jr. 9.0 be held?**
-The Grand Final is scheduled for 11th November 2026. The official venue is currently being finalized by the organizing committee and will be proudly announced on our website (jr.hackx.lk) and social media platforms very soon!
+The Grand Final is scheduled for 11th November 2026. The official venue is currently being finalized by the organizing committee and will be proudly announced on our website (hackxjr.lk) and social media platforms very soon!
 
 **What happens after our team reaches the Grand Final?**
 Reaching the Grand Final opens the doors to an exciting incubation and development phase. Your team won’t be working alone—you will step into intensive preparation rounds designed to transform your proposal into a real-world startup concept.
@@ -301,14 +301,9 @@ Yes. Even if your team doesn't make it to the Grand Finals, exceptionally promis
 
 ## Rules, Updates & Contact Information
 
-**How can I contact the organizing committee if I have an issue?**
-You can reach out directly to our organizing committee members for any urgent inquiries or guidance:
-Harshana Praveen: +94 77 208 6681
-Lawindi Tharunya: +94 71 543 5636
-
 **Where can I get the latest competition updates and results?**
 All official announcements, results, and timeline changes will be shared through:
-Official Website: jr.hackx.lk
+Official Website: hackxjr.lk
 Social Media: The official hackX Junior Facebook page
 Direct Comms: Official WhatsApp announcement groups provided to registered teams.
 

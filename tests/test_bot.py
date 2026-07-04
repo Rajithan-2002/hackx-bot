@@ -117,3 +117,18 @@ def test_direct_endpoints():
         assert response.status_code == 200
         assert response.json()["answer"] == "Direct hackxjr response"
         mock_answer.assert_called_with("jr rules", "hackxjr", "test_jr")
+
+
+def test_load_competition_context():
+    from app.services.llm import load_competition_context, CONTEXT_CACHE
+
+    CONTEXT_CACHE.clear()
+
+    jr_context = load_competition_context("hackxjr")
+    assert "Harshana Praveen" in jr_context
+    assert "hackX Jr. Timeline" in jr_context
+
+    x_context = load_competition_context("hackx")
+    assert "Praveen Madawalage" in x_context
+    assert "hackX 11.0 & ideaX Timeline" in x_context
+

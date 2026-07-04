@@ -25,61 +25,55 @@ def load_competition_context(competition_id: str) -> str:
         return CONTEXT_CACHE[competition_id]
 
     data_dir = os.path.join(os.path.dirname(__file__), "..", "core", "data")
+    content = ""
+
     if competition_id == "hackxjr":
-        file_path = os.path.join(data_dir, "hackx_jr_faq.md")
+        faq_path = os.path.join(data_dir, "hackx_jr_faq.md")
+        timeline_path = os.path.join(data_dir, "hackx_jr_timeline.md")
+        contact_path = os.path.join(data_dir, "hackxjr_contact_details.md")
     else:
-        # For HackX, we might want to combine timeline and hackx_faq, but for now we'll stick to hackx_faq
-        # We can actually combine them if we want to provide timeline data as well.
         faq_path = os.path.join(data_dir, "hackx_faq.md")
-        timeline_path = os.path.join(data_dir, "timeline.md")
-
-        content = ""
-        try:
-            with open(faq_path, "r", encoding="utf-8") as f:
-                content += f.read() + "\n\n"
-            if os.path.exists(timeline_path):
-                with open(timeline_path, "r", encoding="utf-8") as f:
-                    content += f.read()
-        except Exception as e:
-            print(f"Error loading context for {competition_id}: {e}")
-
-        CONTEXT_CACHE[competition_id] = content
-        return content
+        timeline_path = os.path.join(data_dir, "hackx_timeline.md")
+        contact_path = os.path.join(data_dir, "hackx_contact_details.md")
 
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-            CONTEXT_CACHE[competition_id] = content
-            return content
+        if os.path.exists(faq_path):
+            with open(faq_path, "r", encoding="utf-8") as f:
+                content += f.read() + "\n\n"
+        if os.path.exists(timeline_path):
+            with open(timeline_path, "r", encoding="utf-8") as f:
+                content += f.read() + "\n\n"
+        if os.path.exists(contact_path):
+            with open(contact_path, "r", encoding="utf-8") as f:
+                content += f.read()
     except Exception as e:
         print(f"Error loading context for {competition_id}: {e}")
-        return ""
+
+    CONTEXT_CACHE[competition_id] = content
+    return content
+
+
+def load_system_prompt(competition_id: str, context: str) -> str:
+    data_dir = os.path.join(os.path.dirname(__file__), "..", "core", "data")
+    if competition_id == "hackxjr":
+        prompt_path = os.path.join(data_dir, "system_prompt_hackxjr.txt")
+    else:
+        prompt_path = os.path.join(data_dir, "system_prompt_hackx.txt")
+
+    try:
+        with open(prompt_path, "r", encoding="utf-8") as f:
+            template = f.read()
+            return template.replace("{context}", context)
+    except Exception as e:
+        print(f"Error loading system prompt template: {e}")
+        return f"You are the official virtual assistant. Competition Context:\n{context}"
 
 
 async def generate_response(
     competition_id: str, question: str, history: str = ""
 ) -> str:
     context = load_competition_context(competition_id)
-
-    system_prompt = (
-        "You are the official virtual assistant for HackX and HackX Jr.\n"
-        "Your role is to help students, participants, ambassadors, partners, sponsors, and visitors understand the competition and guide them toward successful participation.\n"
-        "You have been provided with the complete, official rulebook, timeline, and FAQ document for the competition below.\n\n"
-        "CRITICAL STRICT GROUNDING RULES:\n"
-        "1. You MUST ONLY answer questions using the information provided in the context below.\n"
-        "2. If the user asks a question that is NOT covered in the provided context (e.g. general programming help, math, history, how to make an app, etc.), YOU MUST REFUSE TO ANSWER.\n"
-        "3. Do not invent, hallucinate, or rely on outside general knowledge to answer questions.\n"
-        "4. If the information is missing from the context, respond exactly with: 'I don't have confirmed information on that yet. Please contact the Organizing Committee or follow the official channels for updates.'\n\n"
-        "Response Style:\n"
-        "- Friendly, professional, and encouraging.\n"
-        "- Clear and concise.\n"
-        "- Formatted using bullet points (-) for readability.\n"
-        "- Use relevant emojis!\n"
-        "- NEVER use Markdown headings (like #, ##, or ###). Just use bold text or bullet points instead.\n"
-        "- DO NOT ask follow-up questions. End cleanly.\n\n"
-        "Competition Rulebook & Context:\n"
-        f"{context}\n"
-    )
+    system_prompt = load_system_prompt(competition_id, context)
 
     prompt = f"Question: {question}\n"
     if history:
