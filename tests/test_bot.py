@@ -130,5 +130,5 @@ def test_load_competition_context():
 
     x_context = load_competition_context("hackx")
     assert "Praveen Madawalage" in x_context
-    assert "hackX 11.0 & ideaX Timeline" in x_context
+    assert "hackX 11.0 Timeline" in x_context
 
