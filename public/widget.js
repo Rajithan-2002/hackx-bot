@@ -1,4 +1,4 @@
-(function() {
+(function () {
     // Generate simple UUID for session context
     function generateSessionId() {
         return 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
@@ -96,7 +96,7 @@
             input.parentElement.style.display = 'flex';
             contextHeader.style.display = 'flex';
             contextIndicator.textContent = '🟢 ' + (selectedCompetition === 'hackx' ? 'HackX' : 'HackX Jr');
-            
+
             if (!isWelcomeShown) {
                 showWelcomeMessage();
                 isWelcomeShown = true;
@@ -165,7 +165,7 @@
         if (!mascotImages[state]) return;
         currentMascotState = state;
         mascotImg.src = mascotImages[state];
-        
+
         mascotLauncher.className = '';
         mascotLauncher.classList.add(state);
     }
@@ -199,7 +199,7 @@
     // Toggle chat panel
     mascotLauncher.addEventListener('click', () => {
         dismissGreeting();
-        
+
         if (panel.style.display === 'flex') {
             panel.style.display = 'none';
             setMascotState(STATES.IDLE);
@@ -215,11 +215,11 @@
         setMascotState(STATES.IDLE);
     });
 
-    
+
     function showWelcomeMessage() {
         const wrapper = document.createElement('div');
         wrapper.className = 'hackx-msg bot';
-        
+
         let actionsHtml = '';
         const actions = ['Registration', 'Eligibility', 'Timeline', 'Rules & Guidelines', 'Contact'];
         actions.forEach(action => {
@@ -259,19 +259,19 @@
 
         const msg = document.createElement('div');
         msg.className = `hackx-msg ${sender}`;
-        
+
         let lines = text.split('\n');
         let htmlLines = [];
         let inList = false;
-        
+
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
-            
+
             // Bold
             line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             // Links
             line = line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: var(--hackx-cyan); text-decoration: underline; font-weight: 500;">$1</a>');
-            
+
             let listMatch = line.trim().match(/^[-*]\s+(.*)/);
             if (listMatch) {
                 if (!inList) {
@@ -290,36 +290,36 @@
         if (inList) {
             htmlLines.push('</ul>');
         }
-        
+
         let content = htmlLines.join('<br/>');
         // Clean up <br/> tags around lists
         content = content.replace(/<br\/>\s*<ul/g, '<ul').replace(/<\/ul>\s*<br\/>/g, '</ul>');
-        
+
         msg.innerHTML = content;
-        
+
         // Add meta info (Debug Badge only - Source info completely removed from UI)
         if (sender === 'bot' && DEBUG && tierInfo !== null) {
             const meta = document.createElement('div');
             meta.className = 'hackx-msg-meta';
-            
+
             let label = 'SYSTEM';
             if (tierInfo === 6 && source === 'retrieved_chunks') {
                 label = 'FALLBACK';
             } else if (tierLabels[tierInfo]) {
                 label = tierLabels[tierInfo];
             }
-            
+
             meta.innerHTML = `<span></span><span class="hackx-debug-badge">⚡ ${label}</span>`;
             msg.appendChild(meta);
         }
-        
+
         messages.appendChild(msg);
 
         // If it's a bot response, also append the browse chips at the bottom
         if (sender === 'bot') {
             const browseContainer = document.createElement('div');
             browseContainer.className = 'hackx-browse-more-container';
-            
+
             browseContainer.innerHTML = `
                 <div class="hackx-browse-more-text" style="margin-top: 10px; font-size: 12px; color: var(--hackx-muted); font-weight: 500;">Do you want further clarifications in other areas?</div>
                 <div class="hackx-quick-replies" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;">
@@ -342,7 +342,7 @@
                 });
             });
         }
-        
+
         messages.scrollTop = messages.scrollHeight;
     }
 
@@ -383,7 +383,7 @@
             const data = await response.json();
             typingIndicator.remove();
             addMessage(data.answer, 'bot', data.tier, data.source);
-            
+
             // Switch to SUCCESS state for 1.5 seconds
             setMascotState(STATES.SUCCESS);
             setTimeout(() => {
@@ -393,14 +393,14 @@
                     setMascotState(STATES.IDLE);
                 }
             }, 1500);
-            
+
         } catch (error) {
             typingIndicator.remove();
-            const errMsg = error.message.includes("Too many requests") 
+            const errMsg = error.message.includes("Too many requests")
                 ? "Too many requests. Please wait a moment."
                 : "Oops! I couldn't reach the server. Please try again.";
             addMessage(errMsg, 'bot');
-            
+
             if (panel.style.display === 'flex') {
                 setMascotState(STATES.THINKING);
             } else {
