@@ -116,7 +116,10 @@ During the initial stages, a strong understanding of the problem and a well-thou
 ## Proposal Submission
 
 **What is a proposal?**
-A proposal is a document that explains your startup idea. It should clearly describe the problem you are solving, who experiences the problem, how your solution works, why it is innovative, and how it could become a sustainable business. An official proposal template will be provided through the hackX website to help participants prepare their submissions according to the required format.
+A proposal is a document that explains your startup idea. It should clearly describe the problem you are solving, who experiences the problem, how your solution works, why it is innovative, and how it could become a sustainable business. An official proposal template will be emailed to registered teams before proposal submission starts and will also be available on the website during the proposal submission period to help participants prepare their submissions.
+
+**Where can I find the proposal template?**
+The official proposal template will be emailed to registered teams before the proposal submission period starts, and it will also be available on the official hackX website (hackx.lk) during the proposal submission period.
 
 **How do I submit my proposal?**
 Proposals must be submitted through the submission portal available on the official hackX website before the stated deadline.

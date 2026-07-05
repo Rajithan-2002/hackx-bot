@@ -3,11 +3,11 @@
 ## Timeline and Important Dates
 
 **hackX Jr. Schedule**
-- **Registrations Open**: 3 July
+- **Registrations Open**: 4 July - 3 August
   - Registration begins for schools and young innovators to embark on their journey.
 - **Awareness Session**: 31 July
   - An introductory session for students and teachers covering the competition, timeline, and what it takes to succeed.
-- **Proposal Submission**: 1 August
+- **Proposal Submission**: 1 August - 14 August
   - Teams submit their innovative ideas and proposed solutions before the proposal submission deadline.
 - **Online Workshop Series 1**: 26 August
   - A series of expert-led workshops designed to strengthen innovation, ideation, and solution development.

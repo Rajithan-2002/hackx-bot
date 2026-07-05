@@ -7,10 +7,8 @@
 - **Registration Close**: 3 August (Monday)
 - **Proposal Submission Open**: 1 August (Saturday)
 - **Proposal Submission Close**: 14 August (Friday)
-- **Semi-Finalists Announcement**: 09 September (Wednesday)
-- **hackX 30 Teams** (Best 5 teams of ideasprint + 25 other university teams): 03 October (Saturday)
+- **Semi-Finals**: 03 October (Saturday)
 - **Venue**: DIM | A8
-- **Finalists Announcement**: 08 October (Thursday)
 
 **hackX 11.0 (Best 15 Teams)**
 - **Workshop 01**: 16 September
@@ -20,7 +18,6 @@
 - **Grand Finals**: 11 November (Wednesday) (Tentative – During National Science Week)
 
 **Important Notes regarding the Timeline:**
-- Semi-finalists announcement date may change.
 - Workshop schedule dates may change.
 - hackX workshop period: 10 September – 31 October.
 - hackX selects 15 teams from university category participants.

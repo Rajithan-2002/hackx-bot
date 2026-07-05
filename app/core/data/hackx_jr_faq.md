@@ -141,7 +141,7 @@ It doesn't have to be a brand-new invention that changes the entire world overni
 Proposal Submission
 
 **What is a proposal?**
-A proposal is a formal document that explains your project or startup idea for hackX Jr. 9.0. It clearly describes the problem you are solving, your target audience, how your solution works, why it is innovative, and how it could become sustainable. The official proposal template will be provided on our website to guide you through the required format.
+A proposal is a formal document that explains your project or startup idea for hackX Jr. 9.0. It clearly describes the problem you are solving, your target audience, how your solution works, why it is innovative, and how it could become sustainable. The official proposal template will be emailed to registered teams before proposal submission starts, and it will also be available on the website during the proposal submission period.
 
 **When can we submit our proposal, and what is the deadline?**
 The proposal submission window opens on 1st August 2026 and closes on 14th August 2026. Please make sure to submit before the deadline, as late or partially completed submissions will be rejected.
@@ -162,7 +162,7 @@ The proposal must be uploaded as a PDF document and must be written in English o
 Yes, the maximum word limit is 3,500 words. You are highly encouraged to include diagrams, images, charts, and other relevant visuals to help explain your idea clearly.
 
 **Where can I find the proposal template, and can I see it beforehand?**
-The official proposal template will be made available on our official website (hackxjr.lk) right when the proposal submission period begins.
+The official proposal template will be emailed to registered teams before the proposal submission period starts, and it will also be available on the official hackX Jr. website (hackxjr.lk) during the proposal submission period.
 
 **Can I resubmit or make changes to my proposal after uploading?**
 To modify a submission, you must carefully follow the specific instructions provided directly on the submission platform. Keep in mind that incomplete proposals will be automatically rejected, so ensure everything is finalized before uploading.
